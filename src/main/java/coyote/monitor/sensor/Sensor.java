@@ -9,14 +9,17 @@
  *   Stephan D. Cote 
  *      - Initial concept and initial implementation
  */
-package coyote.monitor;
+package coyote.monitor.sensor;
 
-import coyote.loader.component.AbstractManagedComponent;
+import coyote.monitor.Collector;
 
 
 /**
- * 
+ * Sensors are continuously running, autonomous components that record changes 
+ * in its environment in real time.
  */
-public class AbstractMonitor extends AbstractManagedComponent {
+public interface Sensor extends Collector {
+
+  public void shutdown();
 
 }

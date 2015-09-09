@@ -11,12 +11,12 @@
  */
 package coyote.monitor;
 
-import coyote.loader.component.AbstractManagedComponent;
+import coyote.loader.thread.ScheduledJob;
 
 
 /**
  * 
  */
-public class AbstractMonitor extends AbstractManagedComponent {
+public abstract class MonitorJob extends ScheduledJob {
 
 }

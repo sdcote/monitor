@@ -11,12 +11,17 @@
  */
 package coyote.monitor;
 
-import coyote.loader.component.AbstractManagedComponent;
+import coyote.dataframe.DataFrame;
 
 
 /**
+ * Collectors data.
  * 
+ * The Monitor Information Base is data related to the operation of one 
+ * specific collector in it function of monitoring some resource. Each 
+ * collector in the monitor has its own MIB dedicated to holding the data 
+ * generated from that collector.</p> 
  */
-public class AbstractMonitor extends AbstractManagedComponent {
+public class MonitorInformationBase extends DataFrame {
 
 }

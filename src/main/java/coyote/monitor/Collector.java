@@ -11,12 +11,15 @@
  */
 package coyote.monitor;
 
-import coyote.loader.component.AbstractManagedComponent;
+import coyote.commons.IDescribable;
+import coyote.commons.IDescribed;
+import coyote.commons.INamable;
+import coyote.commons.INamed;
 
 
 /**
- * 
+ * Defines an interface for both Probes and Sensors.
  */
-public class AbstractMonitor extends AbstractManagedComponent {
+public interface Collector extends Runnable, INamable, INamed, IDescribable, IDescribed {
 
 }

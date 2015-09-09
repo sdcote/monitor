@@ -9,14 +9,11 @@
  *   Stephan D. Cote 
  *      - Initial concept and initial implementation
  */
-package coyote.monitor;
-
-import coyote.loader.component.AbstractManagedComponent;
-
+package coyote.monitor.probe;
 
 /**
  * 
  */
-public class AbstractMonitor extends AbstractManagedComponent {
+public class AbstractProbe {
 
 }

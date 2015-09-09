@@ -13,6 +13,7 @@ package coyote.monitor;
 
 import coyote.loader.log.Log;
 
+
 /**
  * 
  */
@@ -32,7 +33,7 @@ public class DefaultMonitor extends AbstractMonitor {
     // check status of Probes and reload if necessary
     // check status of Sensors and reload if necessary
     // Update any metrics as necessary
-    Log.info("Monitoring");
+    Log.info( "Monitoring" );
   }
 
 

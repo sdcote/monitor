@@ -11,12 +11,9 @@
  */
 package coyote.monitor;
 
-import coyote.loader.component.AbstractManagedComponent;
-
-
 /**
  * 
  */
-public class AbstractMonitor extends AbstractManagedComponent {
+public abstract class AbstractProbe {
 
 }
