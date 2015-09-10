@@ -17,11 +17,11 @@ import coyote.dataframe.DataFrame;
 /**
  * Collectors data.
  * 
- * The Monitor Information Base is data related to the operation of one 
- * specific collector in it function of monitoring some resource. Each 
- * collector in the monitor has its own MIB dedicated to holding the data 
- * generated from that collector.</p> 
+ * The Collector Cache contains data related to the operation of one specific 
+ * collector in its function of monitoring some resource. Each collector in the 
+ * monitor has its own cache dedicated to holding the data generated from that 
+ * collector.</p> 
  */
-public class MonitorInformationBase extends DataFrame {
+public class CollectorCache extends DataFrame {
 
 }
