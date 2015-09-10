@@ -5,8 +5,8 @@ package coyote.monitor;
 
 import java.util.Date;
 
-import coyote.commons.IDescribable;
-import coyote.commons.IDescribed;
+import coyote.commons.Describable;
+import coyote.commons.Described;
 import coyote.dataframe.DataFrame;
 import coyote.dataframe.DataFrameException;
 
@@ -17,7 +17,7 @@ import coyote.dataframe.DataFrameException;
  * @author Stephan D. Cote' - Enterprise Architecture
  * @version $Revision: 1.5 $
  */
-public class MonitorEvent extends DataFrame implements IDescribable, IDescribed {
+public class MonitorEvent extends DataFrame implements Describable, Described {
 
   /** 
    * Not all events are errors, and the message in the event is used to 
@@ -26,7 +26,7 @@ public class MonitorEvent extends DataFrame implements IDescribable, IDescribed 
   public static final String MESSAGE_TAG = "Message";
 
   /** 
-   * The description of the event is normally an explaination of the general 
+   * The description of the event is normally an explanation of the general 
    * purpose of the event itself. This is different from the message of the 
    * event in that the description explains the purpose of the event and the 
    * message described the details of the event.

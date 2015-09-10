@@ -9,14 +9,29 @@
  *   Stephan D. Cote 
  *      - Initial concept and initial implementation
  */
-package coyote.monitor.probe;
+package coyote.monitor.sensor;
 
-import coyote.monitor.AbstractProbe;
+import coyote.monitor.AbstractCollector;
 
 
 /**
  * 
  */
-public class TcpProbe extends AbstractProbe {
+public abstract class AbstractSensor extends AbstractCollector {
+
+  /**
+   * @see coyote.loader.thread.ThreadJob#initialize()
+   */
+  @Override
+  public void initialize() {}
+
+
+
+
+  /**
+   * @see coyote.loader.thread.ThreadJob#terminate()
+   */
+  @Override
+  public void terminate() {}
 
 }

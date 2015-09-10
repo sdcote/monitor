@@ -17,7 +17,7 @@ import coyote.loader.log.Log;
 /**
  * 
  */
-public class DefaultMonitor extends AbstractMonitor {
+public class DefaultMonitor extends AbstractMonitor implements Monitor {
 
   /** Tag used in various class identifying locations. */
   public static final String CLASS = "DefaultMonitor";

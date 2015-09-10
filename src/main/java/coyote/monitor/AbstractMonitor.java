@@ -11,12 +11,12 @@
  */
 package coyote.monitor;
 
-import coyote.loader.component.AbstractManagedComponent;
+import coyote.loader.AbstractLoader;
 
 
 /**
  * 
  */
-public class AbstractMonitor extends AbstractManagedComponent {
+public class AbstractMonitor extends AbstractLoader implements Monitor {
 
 }

@@ -11,17 +11,19 @@
  */
 package coyote.monitor.probe;
 
-
-import coyote.commons.IDescribable;
-import coyote.commons.INamable;
+import coyote.commons.Describable;
+import coyote.commons.Namable;
+import coyote.dataframe.DataFrame;
 import coyote.loader.cfg.Config;
+import coyote.loader.cfg.ConfigSlot;
 import coyote.monitor.AbstractCollector;
 
 
 /**
+ * An AbstractProbe is the base class for all probes and handles a majority of 
  * 
  */
-public class AbstractProbe extends AbstractCollector implements Probe, INamable, IDescribable {
+public abstract class AbstractProbe extends AbstractCollector implements Probe, Namable, Describable {
 
   /**
    * Tag name of the attribute that contains the value of the error verification
@@ -33,27 +35,62 @@ public class AbstractProbe extends AbstractCollector implements Probe, INamable,
   protected boolean verifingErrors = false;
 
 
+
+
   /**
    * Return a DataFrame that can be used as a template for defining instances
    * of this class.
    *
-   * @return a capsule that can be used as a configuration template
+   * @return a configuration that can be used as a template
    */
-  public Config getTemplate()
-  {
+  public Config getTemplate() {
+    // Get the configuration attributes for collectors in general
     Config template = super.getTemplate();
 
-    try
-    {
-      //template.addAttributeSlot( new AttributeSlot( VERIFY_TAG, "Flag indicating the facility will be double-checked if an error occurs with the facility.", Attribute.BOOLEAN_TYPE, false, null, new Boolean( false ) ) );
-    }
-    catch( Exception ex )
-    {
+    try {
+      template.addConfigSlot( new ConfigSlot( VERIFY_TAG, "Flag indicating the facility will be double-checked if an error occurs with the facility.", new Boolean( false ) ) );
+    } catch ( Exception ex ) {
       // Should always work
     }
 
     return template;
   }
+
+
+
+
+  /**
+   * @see coyote.loader.thread.ThreadJob#initialize()
+   */
+  @Override
+  public void initialize() {
+    System.out.println( "initialized" );
+  }
+
+
+
+
+  /**
+   * @see coyote.loader.thread.ThreadJob#doWork()
+   */
+  @Override
+  public void doWork() {
+    System.out.println( "working..." );
+  }
+
+
+
+
+  /**
+   * @see coyote.loader.thread.ThreadJob#terminate()
+   */
+  @Override
+  public void terminate() {
+    System.out.println( "terminated" );
+  }
+
+
+
 
   /**
    * Return whether or not this Probe is verifying errors.
@@ -64,8 +101,7 @@ public class AbstractProbe extends AbstractCollector implements Probe, INamable,
    *
    * @return True indicates the Probe is verifying errors, false otherwise.
    */
-  public boolean isVerifingErrors()
-  {
+  public boolean isVerifingErrors() {
     return verifingErrors;
   }
 
@@ -78,11 +114,20 @@ public class AbstractProbe extends AbstractCollector implements Probe, INamable,
    * @param flag True indicates the Probe should verify errors, false indicates
    *        only call the metric generation routine once.
    */
-  public void setVerifingErrors( boolean flag )
-  {
+  public void setVerifingErrors( boolean flag ) {
     this.verifingErrors = flag;
   }
 
 
+
+
+  /**
+   * @see coyote.monitor.probe.Probe#generateSample()
+   */
+  @Override
+  public DataFrame generateSample() {
+    // TODO Auto-generated method stub
+    return null;
+  }
 
 }

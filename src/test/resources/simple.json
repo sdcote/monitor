@@ -1,28 +1,16 @@
 {
-  "Name": "Loader",
-  "Class": "DefaultLoader",
-  "ID": "16177FFC-AA0E-15A9-714C-B613E3E7E09E",
-  "Components": [
-    {
-      "Name": "Monitor1",
-      "Class": "coyote.monitor.DefaultMonitor",
-      "ID": "F56A",
-      "Probes": [
-        {
-          "Name": "WebProbe",
-          "Class": "coyote.monitor.probe.HttpProbe",
-          "ID": "93D7",
-          "Description" : "Simple demonstration of a Web site probe."
-        }
-      ]
-    }
-  ],
-  "Logger" : {
-    "Class": "ConsoleAppender",
-    "Categories": "TRACE,DEBUG,INFO,LOADER"
-  },
-  "Logger" : {
-    "Class": "SysErrAppender",
-    "Categories": "WARN,ERROR,FATAL"
-  }
+	"Name": "Monitor1",
+	"Class": "coyote.monitor.DefaultMonitor",
+	"ID": "AA0E",
+	"Components": [
+		{
+			"Name": "WebProbe",
+			"Class": "coyote.monitor.probe.HttpProbe",
+			"ID": "93D7",
+			"Description" : "Simple demonstration of a web site probe."
+		}
+	],
+
+	"Logger" : { "Class": "ConsoleAppender", "Categories": "TRACE,DEBUG,INFO,LOADER" },
+	"Logger" : { "Class": "SysErrAppender", "Categories": "WARN,ERROR,FATAL" }
 }

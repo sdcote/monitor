@@ -5,6 +5,10 @@ package coyote.monitor.probe;
 
 import java.net.URI;
 
+import coyote.commons.network.http.HttpMessageException;
+import coyote.commons.network.http.HttpRequest;
+import coyote.commons.network.http.HttpResponse;
+import coyote.dataframe.DataFrame;
 import coyote.loader.cfg.Config;
 import coyote.loader.cfg.ConfigSlot;
 import coyote.loader.log.Log;
@@ -23,38 +27,28 @@ import coyote.loader.log.Log;
  */
 public class HttpProbe extends AbstractProbe {
 
-  /** Field DESTINATION_URI_TAG */
-  public static final String DESTINATION_URI_TAG = "Destination";
+  public static final String DESTINATION_URI = "Destination";
 
-  /** Field CONNECT_TIMEOUT_TAG */
-  public static final String CONNECT_TIMEOUT_TAG = "ConnectTimeout";
+  public static final String CONNECT_TIMEOUT = "ConnectTimeout";
 
-  /** The MD5 signature attribute tag */
-  public static final String SIGNATURE_TAG = "SignatureMD5";
+  /** The expected MD5 signature attribute tag */
+  public static final String SIGNATURE = "SignatureMD5";
 
-  /** Field CONTENT_CHANGE_TAG */
-  public static final String CONTENT_CHANGE_TAG = "ContentChange";
+  public static final String CONTENT_CHANGE = "ContentChange";
 
-  /** Field CONNNECTION_URI_TAG */
-  public static final String CONNNECTION_URI_TAG = "ConnectionURI";
+  public static final String CONNNECTION_URI = "ConnectionURI";
 
-  /** Field SOURCE_ADDRESS_TAG */
-  public static final String SOURCE_ADDRESS_TAG = "SourceAddress";
+  public static final String SOURCE_ADDRESS = "SourceAddress";
 
-  /** Field DESTINATION_ADDRESS_TAG */
-  public static final String DESTINATION_ADDRESS_TAG = "DestinationAddress";
+  public static final String DESTINATION_ADDRESS = "DestinationAddress";
 
-  /** Field CONNECTION_TIME_TAG */
-  public static final String CONNECTION_TIME_TAG = "ConnectionTime";
+  public static final String CONNECTION_TIME = "ConnectionTime";
 
-  /** Field SERVER_LATENCY_TAG */
-  public static final String SERVER_LATENCY_TAG = "ServerLatency";
+  public static final String SERVER_LATENCY = "ServerLatency";
 
-  /** Field BPS_TAG */
-  public static final String BPS_TAG = "BytesPerSecond";
+  public static final String BPS = "BytesPerSecond";
 
-  /** Field CONTENT_LENGTH_TAG */
-  public static final String CONTENT_LENGTH_TAG = "ContentLength";
+  public static final String CONTENT_LENGTH = "ContentLength";
 
   /** The uri of the peer we are to check */
   private URI uri = null;
@@ -72,7 +66,7 @@ public class HttpProbe extends AbstractProbe {
    * Constructor HttpProbe
    */
   public HttpProbe() {
-    //configuration.setClassName( getClass().getName() );
+
   }
 
 
@@ -82,22 +76,57 @@ public class HttpProbe extends AbstractProbe {
    * Return a DataFrame that can be used as a template for defining instances
    * of this class.
    *
-   * @return a capsule that can be used as a configuration template
+   * @return a configuration that can be used as a template for other collectors
    */
   public Config getTemplate() {
+
+    // Get the configuration attributes for probes in general
     Config template = super.getTemplate();
 
     try {
       // HttpProbe specific attributes
       template.setClassName( getClass().getName() );
-      //template.setDescription( "The HTTP Probe sends an HTTP request using the given destination URI and measures the performance of the retrieval process." );
-      template.addConfigSlot( new ConfigSlot( DESTINATION_URI_TAG, "The URI of the resource to test.", new URI( "http://localhost/index.html" ).toString() ) );
-      //template.addConfigSlot( new ConfigSlot( CONNECT_TIMEOUT_TAG, "The number of milliseconds to wait for the connection.", new Integer( 5000 ) ) );
+      template.addConfigSlot( new ConfigSlot( DESTINATION_URI, "The URI of the resource to test.", "http://localhost/index.html" ) );
+      template.addConfigSlot( new ConfigSlot( CONNECT_TIMEOUT, "The number of milliseconds to wait for the connection.", DEFAULT_CONNECT_TIMEOUT ) );
     } catch ( Exception ex ) {
       // Should always work
     }
 
     return template;
+  }
+
+
+
+
+  /**
+   * @see coyote.monitor.probe.AbstractProbe#initialize()
+   */
+  @Override
+  public void initialize() {
+    // Take the configuration values and set them here
+  }
+
+
+
+
+  /**
+   * This will be called by the AbstractProbe many times during its lifetime.
+   * @see coyote.monitor.probe.Probe#generateSample()
+   */
+  @Override
+  public DataFrame generateSample() {
+    DataFrame retval = new DataFrame();
+
+    HttpRequest request = new HttpRequest();
+
+    try {
+      HttpResponse response = request.send( uri );
+    } catch ( HttpMessageException e ) {
+      // TODO Auto-generated catch block
+      e.printStackTrace();
+    }
+
+    return retval;
   }
 
 
@@ -114,18 +143,26 @@ public class HttpProbe extends AbstractProbe {
     Log.startLogging( Log.DEBUG );
 
     // Create a new probe
-    HttpProbe probe = new HttpProbe();
+    Probe probe = new HttpProbe();
+    Config cfg = probe.getTemplate();
+    cfg.setDefaults(); // set the defaults for correct operation
 
-    // probe.uri = new URI( "http", "www.tripod.lycos.com", 80 );
-    // probe.uri = new URI( "http://www.tripod.lycos.com/adm/unknown_host.html" );
-    // probe.uri = new URI( "http://www.bralyn.net/main.html" );
-    probe.uri = new URI( "http://www.terralycos.com/" );
+    // Set the destination of the HTTP probe request
+    cfg.put( HttpProbe.DESTINATION_URI, "www.lycos.com" );
+
+    // Configure the probe to only run once
+    //cfg.put( HttpProbe.EXECUTION_LIMIT, 1 );
+
+    System.out.println( cfg.toFormattedString() );
+
+    // Configure the probe
+    probe.setConfiguration( cfg );
 
     // Run the probe
     probe.run();
 
     // Output the results of the probe run
-    //System.err.println( probe.getMib().toIndentedXML() );
+    //System.err.println( probe.getCollectorCache().toFormattedString() );
 
   }
 

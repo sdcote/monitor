@@ -11,6 +11,7 @@
  */
 package coyote.monitor.probe;
 
+import coyote.dataframe.DataFrame;
 import coyote.monitor.Collector;
 
 
@@ -19,4 +20,5 @@ import coyote.monitor.Collector;
  */
 public interface Probe extends Collector {
 
+  public DataFrame generateSample();
 }
