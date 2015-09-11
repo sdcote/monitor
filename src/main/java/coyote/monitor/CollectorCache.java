@@ -11,6 +11,7 @@
  */
 package coyote.monitor;
 
+import coyote.commons.list.LinkedList;
 import coyote.dataframe.DataFrame;
 
 
@@ -24,4 +25,48 @@ import coyote.dataframe.DataFrame;
  */
 public class CollectorCache extends DataFrame {
 
+  /** 
+   * The current event sequence identifier to be used for identifying events 
+   * from this instrumentation fixture.
+   */
+  private static volatile long _eventSequence = 0;
+
+  /** The name of the attribute that holds our current status */
+  public static final String STATUS_TAG = "Status";
+
+  /** The name of the attribute that holds the last error message */
+  public static final String LAST_ERROR_TAG = "LastErrorMessage";
+
+  /** The name of the attribute that holds the previous status */
+  public static final String PREV_STATUS_TAG = "PreviousStatus";
+
+  /**
+   * Standard string representing the error status - something is wrong with
+   * this component
+   */
+  public static final String ERROR_STATUS = "ERROR";
+
+  /** Standard string representing the clear status - everything is fine */
+  public static final String CLEAR_STATUS = "CLEAR";
+
+  /**
+   * Standard string representing the unknown status - contact with endpoint has
+   * been lost and its status is unknown
+   */
+  public static final String UNKNOWN_STATUS = "UNKNOWN";
+
+  /** The Monitor object to which we are associated */
+  Monitor monitor = null;
+
+  /** The self-synchronized list of all the events in order of their occurence */
+  LinkedList events = new LinkedList();
+
+  /** The self-synchronized list of all the alerts in order of their occurence */
+  LinkedList alerts = new LinkedList();
+
+  /** Number of times the MIB has toggled from down to up */
+  protected int bounceCount = 0;
+
+  /** The current alert identifier for this MIB instance */
+  private volatile long alertid = 0;
 }
