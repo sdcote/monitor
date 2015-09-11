@@ -23,7 +23,7 @@ public class MonitorEvent extends DataFrame implements Describable, Described {
    * Not all events are errors, and the message in the event is used to 
    * describe the details of the event.
    */
-  public static final String MESSAGE_TAG = "Message";
+  public static final String MESSAGE = "Message";
 
   /** 
    * The description of the event is normally an explanation of the general 
@@ -31,18 +31,18 @@ public class MonitorEvent extends DataFrame implements Describable, Described {
    * event in that the description explains the purpose of the event and the 
    * message described the details of the event.
    */
-  public static final String DESCRIPTION_TAG = "Description";
+  public static final String DESCRIPTION = "Description";
 
   /**
    * The existence of this data indicates the event represents an error has 
    * occurred. This is different from the message attribute which describes an 
    * expected event. 
    */
-  public static final String ERROR_TAG = "ErrorMessage";
+  public static final String ERROR = "ErrorMessage";
 
-  public static final String TYPE_TAG = "Type";
-  public static final String TIMESTAMP_TAG = "Timestamp";
-  public static final String TYPE = "Event";
+  public static final String TYPE = "Type";
+  public static final String TIMESTAMP = "Timestamp";
+  public static final String EVENT = "Event";
 
 
 
@@ -51,7 +51,7 @@ public class MonitorEvent extends DataFrame implements Describable, Described {
    * Constructor MonitorEvent
    */
   public MonitorEvent() {
-    setType( TYPE );
+    setType( EVENT );
     setTimestamp();
   }
 
@@ -66,7 +66,6 @@ public class MonitorEvent extends DataFrame implements Describable, Described {
    */
   public MonitorEvent( String msg ) {
     this();
-
     setMessage( msg );
   }
 
@@ -74,22 +73,14 @@ public class MonitorEvent extends DataFrame implements Describable, Described {
 
 
   public void setTimestamp() {
-    try {
-      put( TIMESTAMP_TAG, new Date() );
-    } catch ( Exception ex ) {
-      // Should always, work even when null
-    }
+    put( TIMESTAMP, new Date() );
   }
 
 
 
 
   public void setTimestamp( Date value ) {
-    try {
-      put( TIMESTAMP_TAG, value );
-    } catch ( Exception ex ) {
-      // Should always, work even when null
-    }
+    put( TIMESTAMP, value );
   }
 
 
@@ -97,7 +88,7 @@ public class MonitorEvent extends DataFrame implements Describable, Described {
 
   public Date getTimestamp() {
     try {
-      return getAsDate( TIMESTAMP_TAG );
+      return getAsDate( TIMESTAMP );
     } catch ( DataFrameException e ) {
       return null;
     }
@@ -107,18 +98,14 @@ public class MonitorEvent extends DataFrame implements Describable, Described {
 
 
   public void setType( String value ) {
-    try {
-      put( TYPE_TAG, value );
-    } catch ( Exception ex ) {
-      // Should always, work even when null
-    }
+    put( TYPE, value );
   }
 
 
 
 
   public String getType() {
-    return getAsString( TYPE_TAG );
+    return getAsString( TYPE );
   }
 
 
@@ -138,11 +125,7 @@ public class MonitorEvent extends DataFrame implements Describable, Described {
    * @param desc The text to use as the general description of the event.
    */
   public void setDescription( String desc ) {
-    try {
-      put( DESCRIPTION_TAG, desc );
-    } catch ( Exception ex ) {
-      // Should always, work even when null
-    }
+    put( DESCRIPTION, desc );
   }
 
 
@@ -154,7 +137,7 @@ public class MonitorEvent extends DataFrame implements Describable, Described {
    *         purpose of the event, not give details.
    */
   public String getDescription() {
-    return getAsString( DESCRIPTION_TAG );
+    return getAsString( DESCRIPTION );
   }
 
 
@@ -173,11 +156,7 @@ public class MonitorEvent extends DataFrame implements Describable, Described {
    * @param msg The text to set as the error message.
    */
   public void setError( String msg ) {
-    try {
-      put( ERROR_TAG, msg );
-    } catch ( Exception ex ) {
-      // Should always, work even when null
-    }
+    put( ERROR, msg );
   }
 
 
@@ -187,7 +166,7 @@ public class MonitorEvent extends DataFrame implements Describable, Described {
    * @return The error message currently sent in the event. This may be null.
    */
   public String getError() {
-    return getAsString( ERROR_TAG );
+    return getAsString( ERROR );
   }
 
 
@@ -198,7 +177,7 @@ public class MonitorEvent extends DataFrame implements Describable, Described {
    *         represents an error, false otherwise.
    */
   public boolean hasError() {
-    return contains( ERROR_TAG );
+    return contains( ERROR );
   }
 
 
@@ -213,12 +192,7 @@ public class MonitorEvent extends DataFrame implements Describable, Described {
    * @param msg The message to set.
    */
   public void setMessage( String msg ) {
-    try {
-      put( MESSAGE_TAG, msg );
-    } catch ( Exception ex ) {
-      // should always work even when null
-    }
-
+    put( MESSAGE, msg );
   }
 
 
@@ -228,7 +202,7 @@ public class MonitorEvent extends DataFrame implements Describable, Described {
    * @return The message currently set in the event.
    */
   public void getMessage() {
-    getAsString( MESSAGE_TAG );
+    getAsString( MESSAGE );
   }
 
 }
