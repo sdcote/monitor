@@ -26,12 +26,16 @@ import coyote.loader.cfg.ConfigSlot;
 public abstract class AbstractCollector extends MonitorJob implements Collector {
 
   /** How often do we generate metric data? */
-  protected long metricInterval = DEFAULT_METRIC_INTERVAL;
+  protected long metricInterval = DEFAULT_SAMPLE_INTERVAL;
 
   /** How often do we try to generate metric data when we are in an error state? */
   protected long errorInterval = DEFAULT_ERROR_INTERVAL;
 
+  protected Config configuration = new Config();
+
   private Monitor monitor = null;
+
+  protected CollectorCache mib = new CollectorCache();
 
 
 
@@ -46,11 +50,11 @@ public abstract class AbstractCollector extends MonitorJob implements Collector 
     Config template = new Config();
 
     try {
-      template.addConfigSlot( new ConfigSlot( METRIC_INTERVAL_TAG, "Number of milliseconds between runs.", new Long( 1800000 ) ) );
-      template.addConfigSlot( new ConfigSlot( LOG_METRICS_TAG, "Flag indicating the performance of this collector should be logged.", new Boolean( false ) ) );
-      template.addConfigSlot( new ConfigSlot( ENABLED_TAG, "Flag indicating the collector is enabled to run.", new Boolean( true ) ) );
-      template.addConfigSlot( new ConfigSlot( DESCRIPTION_TAG, "Description of the facility the collector is monitoring.", null ) );
-      template.addConfigSlot( new ConfigSlot( DISPLAY_NAME_TAG, "The name of the collector as it is to appear on reports and displays.", null ) );
+      template.addConfigSlot( new ConfigSlot( MonitorConfig.SAMPLE_INTERVAL, "Number of milliseconds between runs.", new Long( 1800000 ) ) );
+      template.addConfigSlot( new ConfigSlot( MonitorConfig.LOG_SAMPLES, "Flag indicating the performance of this collector should be logged.", new Boolean( false ) ) );
+      template.addConfigSlot( new ConfigSlot( MonitorConfig.ENABLED, "Flag indicating the collector is enabled to run.", new Boolean( true ) ) );
+      template.addConfigSlot( new ConfigSlot( MonitorConfig.DESCRIPTION, "Description of the facility the collector is monitoring.", null ) );
+      template.addConfigSlot( new ConfigSlot( MonitorConfig.DISPLAY_NAME, "The name of the collector as it is to appear on reports and displays.", null ) );
     } catch ( Exception ex ) {
       // should always work
     }
@@ -170,12 +174,27 @@ public abstract class AbstractCollector extends MonitorJob implements Collector 
 
 
   /**
+   * @see coyote.monitor.Collector#isTracing()
+   */
+  @Override
+  public boolean isTracing() {
+    // TODO Auto-generated method stub
+    return false;
+  }
+
+
+
+
+  /**
    * @see coyote.loader.component.ManagedComponent#setConfiguration(coyote.loader.cfg.Config)
    */
   @Override
   public void setConfiguration( Config config ) {
-    // TODO Auto-generated method stub
-
+    if ( config != null ) {
+      configuration = config;
+    } else {
+      configuration = new Config();
+    }
   }
 
 
@@ -258,6 +277,17 @@ public abstract class AbstractCollector extends MonitorJob implements Collector 
    */
   public void setMonitor( Monitor mon ) {
     this.monitor = mon;
+  }
+
+
+
+
+  /**
+   * @see coyote.monitor.Collector#getCache()
+   */
+  @Override
+  public CollectorCache getCache() {
+    return mib;
   }
 
 }

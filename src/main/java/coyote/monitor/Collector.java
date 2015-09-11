@@ -24,45 +24,27 @@ import coyote.loader.cfg.Config;
  */
 public interface Collector extends Runnable, Namable, Named, Describable, Described {
 
-  public static final String COLLECTOR_TAG = "Collector";
+  public static final String CLASS = "Collector";
 
-  public static final String METRIC_INTERVAL_TAG = "MetricInterval";
 
-  public static final long DEFAULT_METRIC_INTERVAL = 3600000;
+  public static final long DEFAULT_SAMPLE_INTERVAL = 3600000;
 
-  public static final String ERROR_INTERVAL_TAG = "ErrorInterval";
 
   public static final long DEFAULT_ERROR_INTERVAL = 60000;
 
-  /** Name of the configuration attribute that contains the maximum number of runs for this collector */
-  public static final String RUN_LIMIT_TAG = "RunLimit";
-
-  public static final String EXPIRES_TAG = "Expires";
-
-  public static final String ENABLED_TAG = "Enabled";
-
-  public static final String DESCRIPTION_TAG = "Description";
-
-  public static final String DISPLAY_NAME_TAG = "DisplayName";
-
-  /**
-   * The attribute tag that relates the name of the collector as defined in
-   * the configuration attribute
-   */
-  public static final String COLLECTOR_NAME_TAG = "CollectorName";
-
-  public static final String LOG_METRICS_TAG = "LogMetrics";
-
-  /**
-   * The name(s) of rule sets against which all our Monitor events and metrics
-   * are checked
-   */
-  public static final String RULESET_TAG = "RuleSet";
-
+ 
 
 
 
   public Config getTemplate();
+
+
+
+
+  /**
+   * @return a reference to the data cache the collector uses to hold all its operational data. 
+   */
+  public CollectorCache getCache();
 
 
 
@@ -79,6 +61,15 @@ public interface Collector extends Runnable, Namable, Named, Describable, Descri
    * @param mon the monitor to which this collector belongs
    */
   public void setMonitor( Monitor mon );
+
+
+
+
+  /**
+   * @return true if the collector is collecting operational data while 
+   *         generating samples, false otherwise.
+   */
+  public boolean isTracing();
 
 
 

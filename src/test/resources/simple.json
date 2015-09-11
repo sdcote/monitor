@@ -1,5 +1,5 @@
 {
-	"Name": "Monitor1",
+	"Name": "Monitor",
 	"Class": "coyote.monitor.DefaultMonitor",
 	"ID": "AA0E",
 	"Components": [
@@ -7,7 +7,13 @@
 			"Name": "WebProbe",
 			"Class": "coyote.monitor.probe.HttpProbe",
 			"ID": "93D7",
-			"Description" : "Simple demonstration of a web site probe."
+			"Description" : "Simple demonstration of a web site probe.",
+			"Enabled": true,
+			"LogMetrics": false,
+			"SampleInterval": 1800000,
+			"ConnectTimeout": 5000,
+			"Verify": false,
+			"Destination": "www.lycos.com"
 		}
 	],
 

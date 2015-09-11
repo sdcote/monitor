@@ -17,20 +17,23 @@ import coyote.dataframe.DataFrame;
 import coyote.loader.cfg.Config;
 import coyote.loader.cfg.ConfigSlot;
 import coyote.monitor.AbstractCollector;
+import coyote.monitor.MonitorConfig;
 
 
 /**
  * An AbstractProbe is the base class for all probes and handles a majority of 
+ * processing.
+ * 
+ * <p>In general, the sub-classes only have to override 
+ * {@link #generateSample()} as it is the specialization of the probe. It is 
+ * also expected that {@link #initialize()} and {@link #terminate()} be over-
+ * ridden to handle any special configuration options and to set-up & tear-down 
+ * any other resources required in generating samples.</p> 
  * 
  */
 public abstract class AbstractProbe extends AbstractCollector implements Probe, Namable, Describable {
 
-  /**
-   * Tag name of the attribute that contains the value of the error verification
-   * config value
-   */
-  public static final String VERIFY_TAG = "Verify";
-
+  
   /** Are we verifying errors by re-generating the metric? default = false */
   protected boolean verifingErrors = false;
 
@@ -48,7 +51,7 @@ public abstract class AbstractProbe extends AbstractCollector implements Probe, 
     Config template = super.getTemplate();
 
     try {
-      template.addConfigSlot( new ConfigSlot( VERIFY_TAG, "Flag indicating the facility will be double-checked if an error occurs with the facility.", new Boolean( false ) ) );
+      template.addConfigSlot( new ConfigSlot( MonitorConfig.VERIFY, "Flag indicating the facility will be double-checked if an error occurs with the facility.", new Boolean( false ) ) );
     } catch ( Exception ex ) {
       // Should always work
     }
@@ -60,6 +63,13 @@ public abstract class AbstractProbe extends AbstractCollector implements Probe, 
 
 
   /**
+   * Initialize the probe based on its currently set configuration.
+   * 
+   * <p><strong>NOTE:</strong> if over-riding this method, be sure to call 
+   * {@code super.initialize()} to allow the base class ({@link AbstractProbe}) 
+   * to perform its initialization. It is best to call this class <em>before</em> 
+   * performing any sub-class initialization logic.</p>
+   * 
    * @see coyote.loader.thread.ThreadJob#initialize()
    */
   @Override
@@ -82,6 +92,11 @@ public abstract class AbstractProbe extends AbstractCollector implements Probe, 
 
 
   /**
+   * <p><strong>NOTE:</strong> if over-riding this method, be sure to call 
+   * {@code super.terminate()} to allow the base class ({@link AbstractProbe}) 
+   * to perform its termination. It is best to call this class <em>after</em> 
+   * performing any sub-class termination logic.</p>
+   * 
    * @see coyote.loader.thread.ThreadJob#terminate()
    */
   @Override

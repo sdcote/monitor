@@ -11,6 +11,7 @@
  */
 package coyote.monitor;
 
+import coyote.commons.StringUtil;
 import coyote.dataframe.DataFrame;
 
 
@@ -23,6 +24,8 @@ public class Sample extends DataFrame {
   public static final String CLASS = "Sample";
   public static final String ERROR = "Error";
   public static final String TYPE = "Type";
+
+  private StringBuffer traceData = new StringBuffer();
 
 
 
@@ -77,6 +80,31 @@ public class Sample extends DataFrame {
    */
   public boolean hasError() {
     return contains( ERROR );
+  }
+
+
+
+
+  public void recordTraceData( String string ) {
+    if ( this.traceData != null && string != null ) {
+      synchronized( traceData ) {
+        traceData.append( string );
+        traceData.append( StringUtil.LINE_FEED );
+      }
+    }
+  }
+
+
+
+
+  public String getTraceData() {
+    if ( traceData != null ) {
+      synchronized( traceData ) {
+        return traceData.toString();
+      }
+    }
+    return null;
+
   }
 
 }

@@ -4,6 +4,7 @@
 package coyote.monitor.probe;
 
 import java.net.URI;
+import java.net.URISyntaxException;
 
 import coyote.commons.ByteUtil;
 import coyote.commons.ExceptionUtil;
@@ -109,6 +110,15 @@ public class HttpProbe extends AbstractProbe {
   @Override
   public void initialize() {
     // Take the configuration values and set them here
+
+    if ( configuration.contains( DESTINATION_URI ) ) {
+      try {
+        uri = new URI( configuration.getAsString( DESTINATION_URI ) );
+      } catch ( URISyntaxException e ) {
+        e.printStackTrace();
+      }
+    }
+
   }
 
 
@@ -143,7 +153,8 @@ public class HttpProbe extends AbstractProbe {
             retval.setError( "Server error response: " + response.getStatusCode() + " - " + response.getReasonPhrase() );
           }
 
-          //if( super.isTracing() )super.recordTraceData( "HTTP response status code: " + response.getStatusCode() + " - " + response.getReasonPhrase() );
+          if ( super.isTracing() )
+            retval.recordTraceData( "HTTP response status code: " + response.getStatusCode() + " - " + response.getReasonPhrase() );
 
           retval.put( CONNECTION_TIME, response.getConnectionTime() );
           retval.put( SERVER_LATENCY, response.getServerLatency() );
@@ -185,11 +196,11 @@ public class HttpProbe extends AbstractProbe {
       } catch ( Exception ae ) {
         Log.warn( getClass().getName() + ":" + getName() + " threw the following exception:\r\n" + ae.getClass().getName() + "\r\n" + ae.getMessage() + "\r\n" + ExceptionUtil.stackTrace( ae ) );
         retval.put( "Error", ae.getMessage() );
-        //super.recordTraceData( ExceptionUtil.stackTrace( ae ) );
+        retval.recordTraceData( ExceptionUtil.stackTrace( ae ) );
       }
       finally {
         // Save a copy of this metric as our last sample
-        //mib.setSample( (DataFrame)retval.clone() );
+        mib.setSample( (DataFrame)retval.clone() );
       }
     } else {
       retval.setError( "No URI specified" );
@@ -218,9 +229,6 @@ public class HttpProbe extends AbstractProbe {
     // Set the destination of the HTTP probe request
     cfg.put( HttpProbe.DESTINATION_URI, "www.lycos.com" );
 
-    // Configure the probe to only run once
-    //cfg.put( HttpProbe.EXECUTION_LIMIT, 1 );
-
     System.out.println( cfg.toFormattedString() );
 
     // Configure the probe
@@ -230,7 +238,7 @@ public class HttpProbe extends AbstractProbe {
     probe.run();
 
     // Output the results of the probe run
-    //System.err.println( probe.getCollectorCache().toFormattedString() );
+    System.err.println( probe.getCache().toFormattedString() );
 
   }
 

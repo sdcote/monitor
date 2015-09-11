@@ -11,9 +11,6 @@
  */
 package coyote.monitor.probe;
 
-import coyote.monitor.AbstractProbe;
-
-
 /**
  * 
  */

@@ -13,6 +13,7 @@ package coyote.monitor.probe;
 
 import coyote.dataframe.DataFrame;
 import coyote.monitor.Collector;
+import coyote.monitor.CollectorCache;
 
 
 /**
@@ -20,5 +21,11 @@ import coyote.monitor.Collector;
  */
 public interface Probe extends Collector {
 
+  /**
+   * @return an abstract data type representing the current state of the context being monitored.
+   */
   public DataFrame generateSample();
+
+
+
 }
