@@ -392,7 +392,6 @@ public class HttpRequest extends HttpMessage {
         if ( StringUtil.isBlank( uri.getAuthority() ) ) {
           path = "/";
         }
-        System.out.println( "PATH:" + path );
 
         this.setRequestPath( uri.getPath() );
       }
@@ -451,7 +450,6 @@ public class HttpRequest extends HttpMessage {
 
     try {
       uri = new URI( requestScheme + "://" + getRequestHost() + getRequestPath() );
-      System.out.println( uri.toString() );
     } catch ( URISyntaxException e ) {
       throw new HttpMessageException( e );
     }
