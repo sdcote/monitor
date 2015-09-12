@@ -34,8 +34,9 @@ public class HttpRequest extends HttpMessage {
    * use this value
    */
   private String requestScheme = "http";
-  private String requestUri = "/";
+  private String requestPath = "/";
   private String requestQuery = null;
+
   private String requestHost = null;
 
   /** The Hashtable of any query variables found on the request URI */
@@ -156,7 +157,7 @@ public class HttpRequest extends HttpMessage {
                       break;
 
                     case 1: // Looking for Request-URI (5.1.2)
-                      setRequestUri( request.substring( mark, i ) );
+                      setRequestPath( request.substring( mark, i ) );
                       mark = i + 1;
                       state = 2;
                       break;
@@ -167,7 +168,7 @@ public class HttpRequest extends HttpMessage {
                   if ( state == 0 ) {
                     throw new HttpMessageException( "No Request-URI found" );
                   } else if ( state == 1 ) {
-                    setRequestUri( request.substring( mark ) );
+                    setRequestPath( request.substring( mark ) );
                     setHttpVersion( HTTP_1_0 ); // Assume version 1.0
                   } else {
                     setHttpVersion( request.substring( mark ) );
@@ -310,7 +311,7 @@ public class HttpRequest extends HttpMessage {
 
     retval.append( requestMethod );
     retval.append( StringUtil.SP );
-    retval.append( requestUri );
+    retval.append( requestPath );
     retval.append( StringUtil.SP );
     retval.append( getHttpVersion() );
     retval.append( StringUtil.CRLF );
@@ -373,31 +374,57 @@ public class HttpRequest extends HttpMessage {
    */
   public HttpResponse send( URI uri ) throws HttpMessageException {
     if ( uri != null ) {
-      this.setRequestScheme( uri.getScheme() );
 
-      if ( ( uri.getPath() == null ) || ( uri.getPath().length() < 1 ) ) {
-        this.setRequestUri( "/" );
-      } else {
-        this.setRequestUri( uri.getPath() );
+      // Set our scheme
+      String scheme = uri.getScheme();
+      if ( StringUtil.isBlank( scheme ) ) {
+        scheme = "http";
       }
 
-      if ( uri.getQuery() != null ) {
-        this.requestUri = this.requestUri + "?" + uri.getQuery();
+      this.setRequestScheme( scheme );
+
+      String path = uri.getPath();
+
+      if ( StringUtil.isBlank( path ) ) {
+        path = "/";
+      } else {
+        // If there is no authority, chances are the authority is being mistaken for the path 
+        if ( StringUtil.isBlank( uri.getAuthority() ) ) {
+          path = "/";
+        }
+        System.out.println( "PATH:" + path );
+
+        this.setRequestPath( uri.getPath() );
+      }
+
+      this.setRequestPath( path );
+
+      if ( StringUtil.isNotBlank( uri.getQuery() ) ) {
+        this.requestPath = this.requestPath + "?" + uri.getQuery();
       }
 
       int requestPort = uri.getPort();
 
-      // make sure we have a port
+      // Make sure we have a port
       if ( requestPort == -1 ) {
-        requestPort = UriUtil.getPort( uri.getScheme() );
+        if ( StringUtil.isNotBlank( uri.getScheme() ) ) {
+          requestPort = UriUtil.getPort( uri.getScheme() );
+        }
 
         // If we still do not have a port, use the default for HTTP
-        if ( requestPort == -1 ) {
+        if ( requestPort < 1 ) {
           requestPort = 80;
         }
       }
 
-      this.setRequestHost( uri.getHost() + ":" + requestPort );
+      String requestHost = uri.getHost();
+
+      // Make sure we have a host
+      if ( StringUtil.isBlank( requestHost ) ) {
+        requestHost = StringUtil.head( uri.toString(), ':' );
+      }
+
+      this.setRequestHost( requestHost + ":" + requestPort );
 
       return send();
     } else {
@@ -423,7 +450,8 @@ public class HttpRequest extends HttpMessage {
     URI uri;
 
     try {
-      uri = new URI( requestScheme + "://" + getRequestHost() + getRequestUri() );
+      uri = new URI( requestScheme + "://" + getRequestHost() + getRequestPath() );
+      System.out.println( uri.toString() );
     } catch ( URISyntaxException e ) {
       throw new HttpMessageException( e );
     }
@@ -500,28 +528,26 @@ public class HttpRequest extends HttpMessage {
 
 
   /**
-   * Method getRequestUri
-   *
-   * @return
+   * @return the path of the request.
    */
-  public String getRequestUri() {
-    return requestUri;
+  public String getRequestPath() {
+    return requestPath;
   }
 
 
 
 
   /**
-   * Method setRequestUri
+   * Set the path of the request, including any parameters.
    *
-   * @param uri
+   * @param request the entire string after the host portion of the URI, including the parameters if available
    */
-  public void setRequestUri( String uri ) {
-    this.requestUri = uri;
+  public void setRequestPath( String request ) {
+    this.requestPath = request;
 
     // If there seems to be query parameters on the URI, parse them out
-    if ( uri.indexOf( '?' ) > -1 ) {
-      this.requestQuery = uri.substring( uri.indexOf( '?' ) + 1 );
+    if ( request.indexOf( '?' ) > -1 ) {
+      this.requestQuery = request.substring( request.indexOf( '?' ) + 1 );
 
       parameters = UriUtil.getParametersAsHashtable( requestQuery );
     }
@@ -555,9 +581,7 @@ public class HttpRequest extends HttpMessage {
 
 
   /**
-   * Method getRequestHost
-   *
-   * @return
+   * @return the host and port (if specified) of the request
    */
   public String getRequestHost() {
     return requestHost;
@@ -567,9 +591,9 @@ public class HttpRequest extends HttpMessage {
 
 
   /**
-   * Method setRequestHost
+   * Set the host (and optional port) of the request.
    *
-   * @param requestHost
+   * @param requestHost the host (and optional port) of the request.
    */
   public void setRequestHost( String requestHost ) {
     this.requestHost = requestHost;
@@ -579,9 +603,7 @@ public class HttpRequest extends HttpMessage {
 
 
   /**
-   * Method getRequestScheme
-   *
-   * @return
+   * @return the scheme (e.g. http, https, ftp, tcp) of the request.
    */
   public String getRequestScheme() {
     return requestScheme;
@@ -591,9 +613,9 @@ public class HttpRequest extends HttpMessage {
 
 
   /**
-   * Method setRequestScheme
+   * Set the scheme (e.g. http, https, ftp, tcp) of the request.
    *
-   * @param requestScheme
+   * @param the scheme (e.g. http, https, ftp, tcp)
    */
   public void setRequestScheme( String requestScheme ) {
     this.requestScheme = requestScheme;

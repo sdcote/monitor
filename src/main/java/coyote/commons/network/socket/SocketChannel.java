@@ -73,8 +73,8 @@ public final class SocketChannel implements Runnable, IChannel {
   IChannelHandler channelHandler = null;
 
   static {
-    addFactory( "tcp", "net.bralyn.network.socket.tcp.TCPSocketFactory" );
-    addFactory( "ssl", "net.bralyn.network.socket.ssl.SSLSocketFactory" );
+    addFactory( "tcp", "coyote.commons.network.socket.tcp.TCPSocketFactory" );
+    addFactory( "ssl", "coyote.commons.network.socket.ssl.SSLSocketFactory" );
   }
 
 

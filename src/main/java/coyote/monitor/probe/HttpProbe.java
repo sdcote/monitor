@@ -14,6 +14,7 @@ import coyote.commons.network.http.HttpRequest;
 import coyote.commons.network.http.HttpResponse;
 import coyote.commons.security.MD5;
 import coyote.dataframe.DataFrame;
+import coyote.dataframe.marshal.JSONMarshaler;
 import coyote.loader.cfg.Config;
 import coyote.loader.cfg.ConfigSlot;
 import coyote.loader.log.Log;
@@ -223,22 +224,35 @@ public class HttpProbe extends AbstractProbe {
 
     // Create a new probe
     Probe probe = new HttpProbe();
+
+    // set the defaults for correct operation
     Config cfg = probe.getTemplate();
-    cfg.setDefaults(); // set the defaults for correct operation
+    cfg.setDefaults();
 
     // Set the destination of the HTTP probe request
-    cfg.put( HttpProbe.DESTINATION_URI, "www.lycos.com" );
+    //cfg.put( HttpProbe.DESTINATION_URI, "www.lycos.com" );
+    //cfg.put( HttpProbe.DESTINATION_URI, "http://www.tripod.lycos.com:80" );
+    //cfg.put( HttpProbe.DESTINATION_URI, "http://www.tripod.lycos.com/adm/unknown_host.html" );
+    // cfg.put( HttpProbe.DESTINATION_URI, "http://www.google.com" );
+    cfg.put( HttpProbe.DESTINATION_URI, "http://dev14122.service-now.com");
 
+    // Show the configuration
     System.out.println( cfg.toFormattedString() );
 
     // Configure the probe
     probe.setConfiguration( cfg );
 
-    // Run the probe
-    probe.run();
+    // initialize the probe
+    probe.initialize();
 
-    // Output the results of the probe run
-    System.err.println( probe.getCache().toFormattedString() );
+    // Have the probe generate a data sample
+    DataFrame sample = probe.generateSample();
+
+    // Close the probe
+    probe.terminate();
+
+    // Disply the sample taken
+    System.out.println( JSONMarshaler.toFormattedString( sample ) );
 
   }
 
