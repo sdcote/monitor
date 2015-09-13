@@ -16,8 +16,6 @@ package coyote.monitor;
  */
 public class MonitorConfig {
   public static final String SAMPLE_INTERVAL = "SampleInterval";
-  /** Name of the configuration attribute that contains the maximum number of runs for this collector */
-  public static final String RUN_LIMIT = "RunLimit";
 
   public static final String EXPIRES = "Expires";
 
