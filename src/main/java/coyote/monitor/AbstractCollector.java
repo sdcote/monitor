@@ -16,8 +16,10 @@ import coyote.dataframe.DataFrameException;
 import coyote.loader.Loader;
 import coyote.loader.cfg.Config;
 import coyote.loader.cfg.ConfigSlot;
+import coyote.loader.component.ManagedComponent;
 import coyote.loader.log.Log;
 import coyote.loader.log.LogMsg;
+import coyote.loader.thread.ScheduledJob;
 
 
 /**
@@ -26,7 +28,7 @@ import coyote.loader.log.LogMsg;
  * It provides capabilities to allow collectors to be loaded as managed 
  * components by the Loader (Default Monitor)
  */
-public abstract class AbstractCollector extends MonitorJob implements Collector {
+public abstract class AbstractCollector extends ScheduledJob implements Collector, ManagedComponent {
 
   /** How often do we generate metric data? */
   protected long metricInterval = DEFAULT_SAMPLE_INTERVAL;
@@ -53,8 +55,8 @@ public abstract class AbstractCollector extends MonitorJob implements Collector 
     Config template = new Config();
 
     try {
-      template.addConfigSlot( new ConfigSlot( MonitorConfig.SAMPLE_INTERVAL, "Number of milliseconds between runs.", new Long( DEFAULT_SAMPLE_INTERVAL ) ) );
-      template.addConfigSlot( new ConfigSlot( MonitorConfig.ERROR_INTERVAL, "Number of milliseconds between runs when in a error state.", new Long( DEFAULT_ERROR_INTERVAL ) ) );
+      template.addConfigSlot( new ConfigSlot( MonitorConfig.SAMPLE_INTERVAL, "Number of milliseconds between sample generation runs.", new Long( DEFAULT_SAMPLE_INTERVAL ) ) );
+      template.addConfigSlot( new ConfigSlot( MonitorConfig.ERROR_INTERVAL, "Number of milliseconds between sample runs when in an error state.", new Long( DEFAULT_ERROR_INTERVAL ) ) );
       template.addConfigSlot( new ConfigSlot( MonitorConfig.ENABLED, "Flag indicating the collector is enabled to run.", new Boolean( true ) ) );
       template.addConfigSlot( new ConfigSlot( MonitorConfig.DESCRIPTION, "Description of the facility the collector is monitoring.", null ) );
     } catch ( Exception ex ) {
@@ -62,6 +64,17 @@ public abstract class AbstractCollector extends MonitorJob implements Collector 
     }
 
     return template;
+  }
+
+
+
+
+  /**
+   * Initialize the collector based on its currently set configuration.
+   */
+  @Override
+  public void initialize() {
+    super.initialize();
   }
 
 
@@ -96,8 +109,7 @@ public abstract class AbstractCollector extends MonitorJob implements Collector 
    */
   @Override
   public Config getConfiguration() {
-    // TODO Auto-generated method stub
-    return null;
+    return configuration;
   }
 
 
@@ -168,7 +180,6 @@ public abstract class AbstractCollector extends MonitorJob implements Collector 
    */
   @Override
   public boolean isLicensed() {
-    // TODO Auto-generated method stub
     return false;
   }
 
@@ -216,8 +227,6 @@ public abstract class AbstractCollector extends MonitorJob implements Collector 
       }
     }
 
-    
-
     //Flag indicating the collector is enabled to run.
     if ( configuration.contains( MonitorConfig.ENABLED ) ) {
       try {
@@ -230,13 +239,14 @@ public abstract class AbstractCollector extends MonitorJob implements Collector 
     //Description of the facility the collector is monitoring.
     if ( configuration.contains( MonitorConfig.DESCRIPTION ) ) {
       try {
-        super.setDescription(  configuration.getAsString( MonitorConfig.DESCRIPTION ));
+        super.setDescription( configuration.getAsString( MonitorConfig.DESCRIPTION ) );
       } catch ( Exception e ) {
         Log.error( LogMsg.createMsg( "Monitor.probe_config_description", e.getMessage() ) );
       }
     }
 
-   
+    // Make seure we start out as active
+    setActiveFlag( true );
 
   }
 

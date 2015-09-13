@@ -19,6 +19,7 @@ import coyote.loader.cfg.Config;
 import coyote.loader.cfg.ConfigSlot;
 import coyote.loader.log.ConsoleAppender;
 import coyote.loader.log.Log;
+import coyote.monitor.MonitorEvent;
 import coyote.monitor.Sample;
 
 
@@ -111,7 +112,7 @@ public class HttpProbe extends AbstractProbe {
    */
   @Override
   public void initialize() {
-    // Take the configuration values and set them here
+    super.initialize();
 
     if ( configuration.contains( DESTINATION_URI ) ) {
       try {
@@ -172,26 +173,24 @@ public class HttpProbe extends AbstractProbe {
           String signature = ByteUtil.bytesToHex( md.digest() );
           retval.put( SIGNATURE, signature );
 
-          //          DataFrame prev = mib.getSample();
-          //
-          //          // Figure out what the previous samples signature was
-          //          String previousSignature = null;
-          //
-          //          if( prev != null )
-          //          {
-          //            previousSignature = prev.getString( SIGNATURE_TAG );
-          //          }
-          //
-          //          // If the current and previous signatures do not match, set the
-          //          // ContentChange attribute to true
-          //          if( ( previousSignature != null ) && !signature.equalsIgnoreCase( previousSignature ) )
-          //          {
-          //            MonitorEvent event = new MonitorEvent( "Content changed" );
-          //            event.set( "OldSignature", previousSignature );
-          //            event.set( "NewSignature", signature );
-          //            mib.addEvent( event );
-          //            metric.putAttribute( CONTENT_CHANGE_TAG, new Boolean( true ) );
-          //          }
+          DataFrame prev = mib.getSample();
+
+          // Figure out what the previous samples signature was
+          String previousSignature = null;
+
+          if ( prev != null ) {
+            previousSignature = prev.getAsString( SIGNATURE);
+          }
+
+          // If the current and previous signatures do not match, set the
+          // ContentChange attribute to true
+          if ( ( previousSignature != null ) && !signature.equalsIgnoreCase( previousSignature ) ) {
+            MonitorEvent event = new MonitorEvent( "Content changed" );
+            event.put( "OldSignature", previousSignature );
+            event.put( "NewSignature", signature );
+            mib.addEvent( event );
+            retval.put( CONTENT_CHANGE, new Boolean( true ) );
+          }
         } else {
           retval.setError( "Could not establish connection in " + connectTimeOut + " ms" );
         }
@@ -207,6 +206,7 @@ public class HttpProbe extends AbstractProbe {
     } else {
       retval.setError( "No URI specified" );
     }
+
     return retval;
   }
 
@@ -243,7 +243,7 @@ public class HttpProbe extends AbstractProbe {
     cfg.put( HttpProbe.DESTINATION_URI, "http://dev14122.service-now.com" );
 
     // Show the configuration
-    System.out.println( cfg.toFormattedString() );
+    Log.info( cfg.toFormattedString() );
 
     // Configure the probe
     probe.setConfiguration( cfg );
@@ -258,7 +258,7 @@ public class HttpProbe extends AbstractProbe {
     probe.terminate();
 
     // Disply the sample taken
-    System.out.println( JSONMarshaler.toFormattedString( sample ) );
+    Log.info( JSONMarshaler.toFormattedString( sample ) );
 
   }
 

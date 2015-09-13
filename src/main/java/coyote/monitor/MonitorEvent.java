@@ -39,6 +39,7 @@ public class MonitorEvent extends DataFrame implements Describable, Described {
    * expected event. 
    */
   public static final String ERROR = "ErrorMessage";
+  public static final String IDENTIFIER = "Identifier";
 
   public static final String TYPE = "Type";
   public static final String TIMESTAMP = "Timestamp";
@@ -203,6 +204,16 @@ public class MonitorEvent extends DataFrame implements Describable, Described {
    */
   public void getMessage() {
     getAsString( MESSAGE );
+  }
+
+
+
+
+  /**
+   * @param id
+   */
+  public void setIdentifier( long id ) {
+    put( IDENTIFIER, id );
   }
 
 }

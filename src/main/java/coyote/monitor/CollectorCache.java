@@ -12,7 +12,9 @@
 package coyote.monitor;
 
 import coyote.commons.list.LinkedList;
+import coyote.commons.list.ListNode;
 import coyote.dataframe.DataFrame;
+import coyote.dataframe.DataFrameException;
 import coyote.dataframe.marshal.JSONMarshaler;
 
 
@@ -77,6 +79,86 @@ public class CollectorCache extends DataFrame {
   public void setSample( DataFrame frame ) {
     frame.put( "Type", "Sample" );
     put( "Sample", frame );
+  }
+
+
+
+
+  /**
+   * @return the previous sample
+   */
+  public DataFrame getSample() {
+    try {
+      return getAsFrame( "Sample" );
+    } catch ( DataFrameException e ) {
+      return null;
+    }
+  }
+
+
+
+
+  /**
+   * Return the next event in the list of events in order of their occurence.
+   *
+   * @return the next event in the list, or null if the event list is empty.
+   */
+  public MonitorEvent getNextEvent() {
+    ListNode node = events.popNode();
+
+    if ( node != null ) {
+      return (MonitorEvent)node.getObject();
+    }
+
+    return null;
+  }
+
+
+
+
+  /**
+   * Add the event to our list of events.
+   *
+   * <p>This method is synchronized to prevent multi-threaded applications from 
+   * possibly generating multiple events with the same identifier.</p> 
+   * 
+   * @param evnt The event to add.
+   * 
+   * @return The sequence identifier of the event or -1 if the event was null.
+   */
+  public synchronized long addEvent( MonitorEvent evnt ) {
+    if ( evnt == null ) {
+      return -1;
+    }
+
+    long retval = _eventSequence++;
+    evnt.setIdentifier( retval );
+
+    // add the event to the list
+    events.add( evnt );
+
+    return retval;
+
+  }
+
+
+
+
+  /**
+   * @return The number of events in this MIB.
+   */
+  public int getEventCount() {
+    return events.size();
+  }
+
+
+
+
+  /**
+   * Clear out all the events in this MIB.
+   */
+  public void clearEvents() {
+    events.clear();
   }
 
 

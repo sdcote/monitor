@@ -42,6 +42,17 @@ public abstract class AbstractProbe extends AbstractCollector implements Probe, 
 
 
 
+  public AbstractProbe() {
+    // Probes to not run continually, only sensors do; set to only run once
+    setDoWorkOnce( true );
+
+    // Probes need to run intermittently and need to be repeatedly rescheduled
+    setRepeatable( true );
+  }
+
+
+
+
   /**
    * Return a DataFrame that can be used as a template for defining instances
    * of this class.
@@ -86,17 +97,18 @@ public abstract class AbstractProbe extends AbstractCollector implements Probe, 
 
   /**
    * Initialize the probe based on its currently set configuration.
-   * 
-   * <p><strong>NOTE:</strong> if over-riding this method, be sure to call 
-   * {@code super.initialize()} to allow the base class ({@link AbstractProbe}) 
-   * to perform its initialization. It is best to call this class <em>before</em> 
-   * performing any sub-class initialization logic.</p>
-   * 
-   * @see coyote.loader.thread.ThreadJob#initialize()
    */
   @Override
   public void initialize() {
-    System.out.println( "initialized" );
+    super.initialize();
+
+    // Set the next (first) time we are to run
+    executionTime = System.currentTimeMillis() + 1000;
+
+    // Setup number of millis between calls to our doWork() method
+    executionInterval = metricInterval;
+    Log.info( "Execution interval is set to " + executionInterval + "ms" );
+
   }
 
 
@@ -107,7 +119,7 @@ public abstract class AbstractProbe extends AbstractCollector implements Probe, 
    */
   @Override
   public void doWork() {
-    Log.info( "Working" );
+    Log.info( "Probe Working...repeat=" + super.isRepeatable() );
     generateSample();
   }
 
@@ -124,7 +136,7 @@ public abstract class AbstractProbe extends AbstractCollector implements Probe, 
    */
   @Override
   public void terminate() {
-    System.out.println( "terminated" );
+    Log.info( "Probe Terminated...repeat=" + super.isRepeatable() );
   }
 
 

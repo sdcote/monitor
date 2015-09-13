@@ -10,13 +10,13 @@
 			"Description" : "Simple demonstration of a web site probe.",
 			"Enabled": true,
 			"LogMetrics": false,
-			"SampleInterval": 1800000,
+			"SampleInterval": 30000,
 			"ConnectTimeout": 5000,
 			"Verify": false,
 			"Destination": "www.lycos.com"
 		}
 	],
 
-	"Logger" : { "Class": "ConsoleAppender", "Categories": "TRACE,DEBUG,INFO,LOADER" },
+	"Logger" : { "Class": "ConsoleAppender", "Categories": "TRACE,DEBUG,INFO,LOADER,THREAD,SCHEDULER" },
 	"Logger" : { "Class": "SysErrAppender", "Categories": "WARN,ERROR,FATAL" }
 }
