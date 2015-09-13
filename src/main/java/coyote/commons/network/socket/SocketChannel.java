@@ -611,7 +611,8 @@ public final class SocketChannel implements Runnable, IChannel {
    * Assign an object to the channel that will handle the communications over
    * the channel
    *
-   * @param handler
+   * @param handler the object which will handle the communications over the 
+   *        channel
    */
   public void setHandler( IChannelHandler handler ) {
     channelHandler = handler;
@@ -623,7 +624,7 @@ public final class SocketChannel implements Runnable, IChannel {
   /**
    * Return the reference to the socket this object represents.
    *
-   * @return
+   * @return the reference to the socket this object represents.
    */
   public Socket getSocket() {
     return socket;
