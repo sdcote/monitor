@@ -12,9 +12,12 @@
 package coyote.monitor;
 
 import coyote.dataframe.DataFrame;
+import coyote.dataframe.DataFrameException;
 import coyote.loader.Loader;
 import coyote.loader.cfg.Config;
 import coyote.loader.cfg.ConfigSlot;
+import coyote.loader.log.Log;
+import coyote.loader.log.LogMsg;
 
 
 /**
@@ -50,11 +53,10 @@ public abstract class AbstractCollector extends MonitorJob implements Collector 
     Config template = new Config();
 
     try {
-      template.addConfigSlot( new ConfigSlot( MonitorConfig.SAMPLE_INTERVAL, "Number of milliseconds between runs.", new Long( 1800000 ) ) );
-      template.addConfigSlot( new ConfigSlot( MonitorConfig.LOG_SAMPLES, "Flag indicating the performance of this collector should be logged.", new Boolean( false ) ) );
+      template.addConfigSlot( new ConfigSlot( MonitorConfig.SAMPLE_INTERVAL, "Number of milliseconds between runs.", new Long( DEFAULT_SAMPLE_INTERVAL ) ) );
+      template.addConfigSlot( new ConfigSlot( MonitorConfig.ERROR_INTERVAL, "Number of milliseconds between runs when in a error state.", new Long( DEFAULT_ERROR_INTERVAL ) ) );
       template.addConfigSlot( new ConfigSlot( MonitorConfig.ENABLED, "Flag indicating the collector is enabled to run.", new Boolean( true ) ) );
       template.addConfigSlot( new ConfigSlot( MonitorConfig.DESCRIPTION, "Description of the facility the collector is monitoring.", null ) );
-      template.addConfigSlot( new ConfigSlot( MonitorConfig.DISPLAY_NAME, "The name of the collector as it is to appear on reports and displays.", null ) );
     } catch ( Exception ex ) {
       // should always work
     }
@@ -195,6 +197,47 @@ public abstract class AbstractCollector extends MonitorJob implements Collector 
     } else {
       configuration = new Config();
     }
+
+    //Number of milliseconds between runs.
+    if ( configuration.contains( MonitorConfig.SAMPLE_INTERVAL ) ) {
+      try {
+        this.metricInterval = configuration.getAsLong( MonitorConfig.SAMPLE_INTERVAL );
+      } catch ( DataFrameException e ) {
+        Log.error( LogMsg.createMsg( "Monitor.probe_config_sample_interval", e.getMessage() ) );
+      }
+    }
+
+    //Number of milliseconds between runs when in an error state.
+    if ( configuration.contains( MonitorConfig.ERROR_INTERVAL ) ) {
+      try {
+        this.errorInterval = configuration.getAsLong( MonitorConfig.ERROR_INTERVAL );
+      } catch ( DataFrameException e ) {
+        Log.error( LogMsg.createMsg( "Monitor.probe_config_error_interval", e.getMessage() ) );
+      }
+    }
+
+    
+
+    //Flag indicating the collector is enabled to run.
+    if ( configuration.contains( MonitorConfig.ENABLED ) ) {
+      try {
+        super.setEnabled( configuration.getAsBoolean( MonitorConfig.ENABLED ) );
+      } catch ( DataFrameException e ) {
+        Log.error( LogMsg.createMsg( "Monitor.probe_config_enabled", e.getMessage() ) );
+      }
+    }
+
+    //Description of the facility the collector is monitoring.
+    if ( configuration.contains( MonitorConfig.DESCRIPTION ) ) {
+      try {
+        super.setDescription(  configuration.getAsString( MonitorConfig.DESCRIPTION ));
+      } catch ( Exception e ) {
+        Log.error( LogMsg.createMsg( "Monitor.probe_config_description", e.getMessage() ) );
+      }
+    }
+
+   
+
   }
 
 

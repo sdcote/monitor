@@ -14,8 +14,11 @@ package coyote.monitor.probe;
 import coyote.commons.Describable;
 import coyote.commons.Namable;
 import coyote.dataframe.DataFrame;
+import coyote.dataframe.DataFrameException;
 import coyote.loader.cfg.Config;
 import coyote.loader.cfg.ConfigSlot;
+import coyote.loader.log.Log;
+import coyote.loader.log.LogMsg;
 import coyote.monitor.AbstractCollector;
 import coyote.monitor.MonitorConfig;
 
@@ -33,7 +36,6 @@ import coyote.monitor.MonitorConfig;
  */
 public abstract class AbstractProbe extends AbstractCollector implements Probe, Namable, Describable {
 
-  
   /** Are we verifying errors by re-generating the metric? default = false */
   protected boolean verifingErrors = false;
 
@@ -63,6 +65,26 @@ public abstract class AbstractProbe extends AbstractCollector implements Probe, 
 
 
   /**
+   * @see coyote.monitor.AbstractCollector#setConfiguration(coyote.loader.cfg.Config)
+   */
+  @Override
+  public void setConfiguration( Config config ) {
+    super.setConfiguration( config );
+
+    if ( configuration.contains( MonitorConfig.VERIFY ) ) {
+      try {
+        this.verifingErrors = configuration.getAsBoolean( MonitorConfig.VERIFY );
+      } catch ( DataFrameException e ) {
+        Log.error( LogMsg.createMsg( "Monitor.probe_config_verify_error", e.getMessage() ) );
+      }
+    }
+
+  }
+
+
+
+
+  /**
    * Initialize the probe based on its currently set configuration.
    * 
    * <p><strong>NOTE:</strong> if over-riding this method, be sure to call 
@@ -85,7 +107,8 @@ public abstract class AbstractProbe extends AbstractCollector implements Probe, 
    */
   @Override
   public void doWork() {
-    System.out.println( "working..." );
+    Log.info( "Working" );
+    generateSample();
   }
 
 
