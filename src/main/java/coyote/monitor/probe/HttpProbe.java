@@ -17,6 +17,7 @@ import coyote.dataframe.DataFrame;
 import coyote.dataframe.marshal.JSONMarshaler;
 import coyote.loader.cfg.Config;
 import coyote.loader.cfg.ConfigSlot;
+import coyote.loader.log.ConsoleAppender;
 import coyote.loader.log.Log;
 import coyote.monitor.Sample;
 
@@ -220,7 +221,12 @@ public class HttpProbe extends AbstractProbe {
    * @throws Exception
    */
   public static void main( String[] args ) throws Exception {
-    Log.startLogging( Log.DEBUG );
+
+    // Replace the default logger (NullAppender) with the console logger
+    Log.addLogger( Log.DEFAULT_LOGGER_NAME, new ConsoleAppender( Log.TRACE_EVENTS | Log.DEBUG_EVENTS | Log.INFO_EVENTS | Log.WARN_EVENTS | Log.ERROR_EVENTS | Log.FATAL_EVENTS ) );
+    // Log HTTP events
+    //Log.startLogging( "HTTP" );
+    Log.setMask( -1 ); // trick to start logging everything
 
     // Create a new probe
     Probe probe = new HttpProbe();
@@ -234,7 +240,7 @@ public class HttpProbe extends AbstractProbe {
     //cfg.put( HttpProbe.DESTINATION_URI, "http://www.tripod.lycos.com:80" );
     //cfg.put( HttpProbe.DESTINATION_URI, "http://www.tripod.lycos.com/adm/unknown_host.html" );
     // cfg.put( HttpProbe.DESTINATION_URI, "http://www.google.com" );
-    cfg.put( HttpProbe.DESTINATION_URI, "http://dev14122.service-now.com");
+    cfg.put( HttpProbe.DESTINATION_URI, "http://dev14122.service-now.com" );
 
     // Show the configuration
     System.out.println( cfg.toFormattedString() );
