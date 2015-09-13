@@ -71,7 +71,7 @@ public class HttpRequest extends HttpMessage {
     setHeader( ACCEPT, "image/gif, image/x-xbitmap, image/jpeg, image/pjpeg, */*" );
     setHeader( ACCEPT_LANGUAGE, "en" );
     setHeader( ACCEPT_ENCODING, "gzip, deflate" );
-    setHeader( USER_AGENT, "Mozilla/4.0 (compatible; BralynHTTP; Java)" );
+    setHeader( USER_AGENT, "Mozilla/4.0 (compatible; CoyoteHTTP; Java)" );
     setHeader( CONNECTION, KEEP_ALIVE );
   }
 
@@ -435,11 +435,11 @@ public class HttpRequest extends HttpMessage {
 
 
   /**
-   * Method send
+   * Send the request, returning any response.
    *
-   * @todo Change the channel.getOutputStream().write( toString().getBytes( HTTP_ENCODING ) ); to somthing that will allow binary posts (toString won't cut it)
+   * TODO Change the channel.getOutputStream().write( toString().getBytes( HTTP_ENCODING ) ); to something that will allow binary posts (toString won't cut it)
    *
-   * @return
+   * @return The response to the request
    *
    * @throws HttpMessageException
    */
