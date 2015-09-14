@@ -39,7 +39,6 @@ public class DefaultMonitor extends AbstractMonitor implements Monitor {
   private static final Version VERSION = new Version( 0, 9, 0, Version.DEVELOPMENT );
 
   static {
-
     LogMsg.setBundleBaseNameDefault( new BundleBaseName( "MonitorMsg" ) );
   }
 
@@ -93,11 +92,6 @@ public class DefaultMonitor extends AbstractMonitor implements Monitor {
     b.append( System.getProperty( "os.version" ) );
     b.append( ")" );
     Log.info( b );
-
-    // Start our scheduled jobs running
-    if ( scheduler != null ) {
-      scheduler.daemonize();
-    }
 
     // enter a loop performing watchdog and maintenance functions
     watchdog();
