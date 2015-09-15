@@ -13,7 +13,6 @@ package coyote.monitor;
 
 import java.util.Iterator;
 
-import sun.management.Sensor;
 import coyote.commons.Version;
 import coyote.dataframe.DataFrame;
 import coyote.loader.cfg.Config;
@@ -21,6 +20,7 @@ import coyote.loader.component.ManagedComponent;
 import coyote.loader.log.Log;
 import coyote.loader.log.LogMsg;
 import coyote.loader.log.LogMsg.BundleBaseName;
+import coyote.monitor.sensor.Sensor;
 
 
 /**
