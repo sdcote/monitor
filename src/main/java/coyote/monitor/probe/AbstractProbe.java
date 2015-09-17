@@ -48,7 +48,7 @@ public abstract class AbstractProbe extends AbstractCollector implements Probe, 
 
     // Probes need to run intermittently and need to be repeatedly rescheduled
     setRepeatable( true );
-    
+
     // Set the next (first) time we are to run
     executionTime = System.currentTimeMillis() + 1000;
 
@@ -132,9 +132,7 @@ public abstract class AbstractProbe extends AbstractCollector implements Probe, 
    * @see coyote.loader.thread.ThreadJob#terminate()
    */
   @Override
-  public void terminate() {
-    Log.info( "Probe Terminated...repeat=" + super.isRepeatable() );
-  }
+  public void terminate() {}
 
 
 
