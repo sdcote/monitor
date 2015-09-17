@@ -1,6 +1,5 @@
-package coyote.commons;
 /*
- * Copyright (c) 2015 Stephan D. Cote' - All rights reserved.
+ * Copyright (c) 2003 Stephan D. Cote' - All rights reserved.
  * 
  * This program and the accompanying materials are made available under the 
  * terms of the MIT License which accompanies this distribution, and is 
@@ -10,6 +9,7 @@ package coyote.commons;
  *   Stephan D. Cote 
  *      - Initial concept and initial implementation
  */
+package coyote.commons;
 
 
 import java.io.IOException;

@@ -1,7 +1,13 @@
 /*
- * $Id: CookieJar.java,v 1.3 2004/11/02 20:57:23 cotes Exp $
+ * Copyright (c) 2003 Stephan D. Cote' - All rights reserved.
+ * 
+ * This program and the accompanying materials are made available under the 
+ * terms of the MIT License which accompanies this distribution, and is 
+ * available at http://creativecommons.org/licenses/MIT/
  *
- * Copyright (C) 2003 Stephan D. Cote' - All rights reserved.
+ * Contributors:
+ *   Stephan D. Cote 
+ *      - Initial concept and initial implementation
  */
 package coyote.commons.network.http;
 
@@ -14,8 +20,7 @@ import coyote.commons.ArrayUtil;
 /**
  * Class CookieJar
  */
-public class CookieJar
-{
+public class CookieJar {
 
   /** Our collection of cookies */
   private Cookie[] cookies = null;
@@ -26,9 +31,7 @@ public class CookieJar
   /**
    * Constructor CookieJar
    */
-  public CookieJar()
-  {
-  }
+  public CookieJar() {}
 
 
 
@@ -38,19 +41,14 @@ public class CookieJar
    *
    * @param array
    */
-  public void addCookies( Cookie[] array )
-  {
-    if( array != null )
-    {
-      if( cookies == null )
-      {
+  public void addCookies( Cookie[] array ) {
+    if ( array != null ) {
+      if ( cookies == null ) {
         cookies = new Cookie[array.length];
 
         System.arraycopy( array, 0, cookies, 0, array.length );
       }
-    }
-    else
-    {
+    } else {
       cookies = (Cookie[])ArrayUtil.addElements( cookies, array );
     }
   }
@@ -63,17 +61,12 @@ public class CookieJar
    *
    * @param cookie
    */
-  public void addCookie( Cookie cookie )
-  {
-    if( cookie != null )
-    {
-      if( cookies == null )
-      {
+  public void addCookie( Cookie cookie ) {
+    if ( cookie != null ) {
+      if ( cookies == null ) {
         cookies = new Cookie[1];
         cookies[0] = cookie;
-      }
-      else
-      {
+      } else {
         cookies = (Cookie[])ArrayUtil.addElement( cookies, cookie );
       }
     }
@@ -90,19 +83,15 @@ public class CookieJar
    *
    * @return
    */
-  public Cookie getCookie( String name )
-  {
-    if( cookies == null )
-    {
+  public Cookie getCookie( String name ) {
+    if ( cookies == null ) {
       return null;
     }
 
     // Look through all the cookies we have
-    for( int i = 0; i < cookies.length; i++ )
-    {
+    for ( int i = 0; i < cookies.length; i++ ) {
       // return the first cookie we find with a matching name
-      if( cookies[i].getName().equals( name ) )
-      {
+      if ( cookies[i].getName().equals( name ) ) {
         return cookies[i];
       }
     }
@@ -119,8 +108,7 @@ public class CookieJar
    *
    * @return
    */
-  public int getCookieCount()
-  {
+  public int getCookieCount() {
     return cookies.length;
   }
 
@@ -134,18 +122,14 @@ public class CookieJar
    *
    * @return
    */
-  public Enumeration getCookieEnumeration( String name )
-  {
-    if( cookies != null )
-    {
+  public Enumeration getCookieEnumeration( String name ) {
+    if ( cookies != null ) {
       Vector vector = new Vector();
 
       // Look through all the cookies we have
-      for( int i = 0; i < cookies.length; i++ )
-      {
+      for ( int i = 0; i < cookies.length; i++ ) {
         // return the first cookie we find with a matching name
-        if( cookies[i].getName().equals( name ) )
-        {
+        if ( cookies[i].getName().equals( name ) ) {
           vector.add( cookies[i] );
         }
       }
@@ -166,18 +150,14 @@ public class CookieJar
    *
    * @return
    */
-  public Cookie[] getCookies( String name )
-  {
+  public Cookie[] getCookies( String name ) {
     Vector vector = new Vector();
 
-    if( cookies != null )
-    {
+    if ( cookies != null ) {
       // Look through all the cookies we have
-      for( int i = 0; i < cookies.length; i++ )
-      {
+      for ( int i = 0; i < cookies.length; i++ ) {
         // return the first cookie we find with a matching name
-        if( cookies[i].getName().equals( name ) )
-        {
+        if ( cookies[i].getName().equals( name ) ) {
           vector.add( cookies[i] );
         }
       }

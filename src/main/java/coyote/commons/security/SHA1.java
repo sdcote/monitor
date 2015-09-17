@@ -1,7 +1,13 @@
 /*
- * $Id: SHA1.java,v 1.2 2004/04/16 12:17:01 cotes Exp $
+ * Copyright (c) 2003 Stephan D. Cote' - All rights reserved.
+ * 
+ * This program and the accompanying materials are made available under the 
+ * terms of the MIT License which accompanies this distribution, and is 
+ * available at http://creativecommons.org/licenses/MIT/
  *
- * Copyright (C) 2003 Stephan D. Cote' - All rights reserved.
+ * Contributors:
+ *   Stephan D. Cote 
+ *      - Initial implementation
  */
 package coyote.commons.security;
 
@@ -44,8 +50,7 @@ package coyote.commons.security;
  *      34AA973C D4C4DAA4 F61EEB2B DBAD2731 6534016F
  * </pre>
  */
-public final class SHA1 implements Digest
-{
+public final class SHA1 implements Digest {
 
   private int state[] = new int[5];
   private long count;
@@ -70,8 +75,7 @@ public final class SHA1 implements Digest
    *
    * @param b true for SHA-1, false for the original SHA-0
    */
-  public SHA1( boolean b )
-  {
+  public SHA1( boolean b ) {
     count = 0;
     digestValid = false;
     NSA = b;
@@ -85,8 +89,7 @@ public final class SHA1 implements Digest
   /**
    * Simple constructor for SHA-1
    */
-  public SHA1()
-  {
+  public SHA1() {
     this( true );
   }
 
@@ -98,8 +101,7 @@ public final class SHA1 implements Digest
    *
    * @return
    */
-  public final int digestSize()
-  {
+  public final int digestSize() {
     return 160;
   }
 
@@ -112,10 +114,8 @@ public final class SHA1 implements Digest
    * @param digest int[] into which to place 5 elements
    * @param offset index of first of the 5 elements
    */
-  public void extract( int[] digest, int offset )
-  {
-    for( int i = 0; i < 5; ++i )
-    {
+  public void extract( int[] digest, int offset ) {
+    for ( int i = 0; i < 5; ++i ) {
       digest[i + offset] = ( ( digestBits[4 * i + 0] << 24 ) & 0xFF000000 ) | ( ( digestBits[4 * i + 1] << 16 ) & 0x00FF0000 ) | ( ( digestBits[4 * i + 2] << 8 ) & 0x0000FF00 ) | ( ( digestBits[4 * i + 3] ) & 0x000000FF );
     }
   }
@@ -131,8 +131,7 @@ public final class SHA1 implements Digest
    *
    * @return
    */
-  private final int rol( int value, int bits )
-  {
+  private final int rol( int value, int bits ) {
     int q = ( value << bits ) | ( value >>> ( 32 - bits ) );
     return q;
   }
@@ -147,8 +146,7 @@ public final class SHA1 implements Digest
    *
    * @return
    */
-  private final int blk0( int i )
-  {
+  private final int blk0( int i ) {
     block[i] = ( rol( block[i], 24 ) & 0xFF00FF00 ) | ( rol( block[i], 8 ) & 0x00FF00FF );
 
     return block[i];
@@ -164,12 +162,10 @@ public final class SHA1 implements Digest
    *
    * @return
    */
-  private final int blk( int i )
-  {
+  private final int blk( int i ) {
     block[i & 15] = block[( i + 13 ) & 15] ^ block[( i + 8 ) & 15] ^ block[( i + 2 ) & 15] ^ block[i & 15];
 
-    if( NSA )
-    {  
+    if ( NSA ) {
       // this makes it SHA-1
       block[i & 15] = rol( block[i & 15], 1 );
     }
@@ -191,8 +187,7 @@ public final class SHA1 implements Digest
    * @param z
    * @param i
    */
-  private final void R0( int data[], int v, int w, int x, int y, int z, int i )
-  {
+  private final void R0( int data[], int v, int w, int x, int y, int z, int i ) {
     data[z] += ( ( data[w] & ( data[x] ^ data[y] ) ) ^ data[y] ) + blk0( i ) + 0x5A827999 + rol( data[v], 5 );
     data[w] = rol( data[w], 30 );
   }
@@ -211,8 +206,7 @@ public final class SHA1 implements Digest
    * @param z
    * @param i
    */
-  private final void R1( int data[], int v, int w, int x, int y, int z, int i )
-  {
+  private final void R1( int data[], int v, int w, int x, int y, int z, int i ) {
     data[z] += ( ( data[w] & ( data[x] ^ data[y] ) ) ^ data[y] ) + blk( i ) + 0x5A827999 + rol( data[v], 5 );
     data[w] = rol( data[w], 30 );
   }
@@ -231,8 +225,7 @@ public final class SHA1 implements Digest
    * @param z
    * @param i
    */
-  private final void R2( int data[], int v, int w, int x, int y, int z, int i )
-  {
+  private final void R2( int data[], int v, int w, int x, int y, int z, int i ) {
     data[z] += ( data[w] ^ data[x] ^ data[y] ) + blk( i ) + 0x6ED9EBA1 + rol( data[v], 5 );
     data[w] = rol( data[w], 30 );
   }
@@ -251,8 +244,7 @@ public final class SHA1 implements Digest
    * @param z
    * @param i
    */
-  private final void R3( int data[], int v, int w, int x, int y, int z, int i )
-  {
+  private final void R3( int data[], int v, int w, int x, int y, int z, int i ) {
     data[z] += ( ( ( data[w] | data[x] ) & data[y] ) | ( data[w] & data[x] ) ) + blk( i ) + 0x8F1BBCDC + rol( data[v], 5 );
     data[w] = rol( data[w], 30 );
   }
@@ -271,8 +263,7 @@ public final class SHA1 implements Digest
    * @param z
    * @param i
    */
-  private final void R4( int data[], int v, int w, int x, int y, int z, int i )
-  {
+  private final void R4( int data[], int v, int w, int x, int y, int z, int i ) {
     data[z] += ( data[w] ^ data[x] ^ data[y] ) + blk( i ) + 0xCA62C1D6 + rol( data[v], 5 );
     data[w] = rol( data[w], 30 );
   }
@@ -287,8 +278,7 @@ public final class SHA1 implements Digest
    * class cast check each time you store into the array.
    */
 
-  private void transform()
-  {
+  private void transform() {
 
     /* Copy context->state[] to working vars */
     dd[0] = state[0];
@@ -393,8 +383,7 @@ public final class SHA1 implements Digest
   /**
    * Zero the count and state arrays
    */
-  public final void clear()
-  {
+  public final void clear() {
     count = 0;
     state[0] = state[1] = state[2] = state[3] = state[4] = 0;
   }
@@ -405,8 +394,7 @@ public final class SHA1 implements Digest
   /**
    * Initializes new context
    */
-  public void init()
-  {
+  public void init() {
     /* SHA1 initialization constants */
     state[0] = 0x67452301;
     state[1] = 0xEFCDAB89;
@@ -430,8 +418,7 @@ public final class SHA1 implements Digest
    *
    * @param b byte to add
    */
-  public void update( byte b )
-  {
+  public void update( byte b ) {
     int mask = ( blockIndex & 3 ) << 3;
     count += 8;
     block[blockIndex >> 2] &= ~( 0xff << mask );
@@ -439,8 +426,7 @@ public final class SHA1 implements Digest
 
     blockIndex++;
 
-    if( blockIndex == 64 )
-    {
+    if ( blockIndex == 64 ) {
       transform();
 
       blockIndex = 0;
@@ -457,10 +443,8 @@ public final class SHA1 implements Digest
    * @param offset start byte
    * @param length number of bytes to hash
    */
-  public final void update( byte[] data, int offset, int length )
-  {
-    for( int i = 0; i < length; ++i )
-    {
+  public final void update( byte[] data, int offset, int length ) {
+    for ( int i = 0; i < length; ++i ) {
       update( data[offset + i] );
     }
   }
@@ -473,8 +457,7 @@ public final class SHA1 implements Digest
    *
    * @param data
    */
-  public final void update( byte[] data )
-  {
+  public final void update( byte[] data ) {
     update( data, 0, data.length );
   }
 
@@ -488,13 +471,11 @@ public final class SHA1 implements Digest
    * @param offset
    * @param reset If true, the hash function is reinitialized
    */
-  public final void digest( boolean reset, byte[] buffer, int offset )
-  {
+  public final void digest( boolean reset, byte[] buffer, int offset ) {
     finish();
     System.arraycopy( digestBits, 0, buffer, offset, digestBits.length );
 
-    if( reset )
-    {
+    if ( reset ) {
       init();
     }
   }
@@ -509,8 +490,7 @@ public final class SHA1 implements Digest
    *
    * @return the byte array result
    */
-  public final byte[] digest( boolean reset )
-  {
+  public final byte[] digest( boolean reset ) {
     byte[] out = new byte[20];
     digest( reset, out, 0 );
 
@@ -525,8 +505,7 @@ public final class SHA1 implements Digest
    *
    * @return the byte array result
    */
-  public final byte[] digest()
-  {
+  public final byte[] digest() {
     return digest( true );
   }
 
@@ -536,31 +515,26 @@ public final class SHA1 implements Digest
   /**
    * Complete processing on the message digest.
    */
-  protected void finish()
-  {
+  protected void finish() {
     byte bits[] = new byte[8];
     int i, j;
 
-    for( i = 0; i < 8; i++ )
-    {
+    for ( i = 0; i < 8; i++ ) {
       bits[i] = (byte)( ( count >>> ( ( ( 7 - i ) << 3 ) ) ) & 0xff );
     }
 
     update( (byte)128 );
 
-    while( blockIndex != 56 )
-    {
+    while ( blockIndex != 56 ) {
       update( (byte)0 );
     }
 
     // This should cause a transform to happen.
-    for( i = 0; i < 8; ++i )
-    {
+    for ( i = 0; i < 8; ++i ) {
       update( bits[i] );
     }
 
-    for( i = 0; i < 20; i++ )
-    {
+    for ( i = 0; i < 20; i++ ) {
       digestBits[i] = (byte)( ( state[i >> 2] >>> ( ( 3 - ( i & 3 ) ) << 3 ) ) & 0xff );
     }
 
@@ -576,12 +550,10 @@ public final class SHA1 implements Digest
    *
    * @return
    */
-  protected String digout()
-  {
+  protected String digout() {
     StringBuffer sb = new StringBuffer();
 
-    for( int i = 0; i < 20; i++ )
-    {
+    for ( int i = 0; i < 20; i++ ) {
       char c1, c2;
 
       c1 = (char)( ( digestBits[i] >>> 4 ) & 0xf );
@@ -604,8 +576,7 @@ public final class SHA1 implements Digest
    *
    * @param args
    */
-  public static void main( String[] args )
-  {
+  public static void main( String[] args ) {
     int i, j;
     SHA1 s = new SHA1( true );
 
@@ -630,8 +601,7 @@ public final class SHA1 implements Digest
 
     s.init();
 
-    for( i = 0; i < z.length(); ++i )
-    {
+    for ( i = 0; i < z.length(); ++i ) {
       s.update( (byte)z.charAt( i ) );
     }
 
@@ -646,8 +616,7 @@ public final class SHA1 implements Digest
     System.out.println( "Last test is 1 million 'a' characters." );
     s.init();
 
-    for( i = 0; i < 1000000; i++ )
-    {
+    for ( i = 0; i < 1000000; i++ ) {
       s.update( (byte)'a' );
     }
 
@@ -661,4 +630,3 @@ public final class SHA1 implements Digest
     System.out.println( " done, elapsed time = " + d );
   }
 }
-

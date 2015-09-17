@@ -1,17 +1,23 @@
 /*
- * $Id: SHA256.java,v 1.1 2003/06/06 15:02:41 cotes Exp $
+ * Copyright (c) 2003 Stephan D. Cote' - All rights reserved.
+ * 
+ * This program and the accompanying materials are made available under the 
+ * terms of the MIT License which accompanies this distribution, and is 
+ * available at http://creativecommons.org/licenses/MIT/
  *
- * Copyright (C) 2003 Stephan D. Cote' - All rights reserved.
+ * Contributors:
+ *   Stephan D. Cote 
+ *      - Initial implementation
  */
 package coyote.commons.security;
 
 import coyote.commons.ByteUtil;
 
+
 /**
  * @version $Revision: 1.1 $
  */
-public class SHA256 implements Digest
-{
+public class SHA256 implements Digest {
 
   /** Size (in bytes) of this hash */
   private static final int HASH_SIZE = 32;
@@ -27,18 +33,7 @@ public class SHA256 implements Digest
   private long byteCount;
 
   /** Round constants */
-  private static final int K[] = { 
-    0x428a2f98, 0x71374491, 0xb5c0fbcf, 0xe9b5dba5, 0x3956c25b, 0x59f111f1, 
-    0x923f82a4, 0xab1c5ed5, 0xd807aa98, 0x12835b01, 0x243185be, 0x550c7dc3, 
-    0x72be5d74, 0x80deb1fe, 0x9bdc06a7, 0xc19bf174, 0xe49b69c1, 0xefbe4786, 
-    0x0fc19dc6, 0x240ca1cc, 0x2de92c6f, 0x4a7484aa, 0x5cb0a9dc, 0x76f988da, 
-    0x983e5152, 0xa831c66d, 0xb00327c8, 0xbf597fc7, 0xc6e00bf3, 0xd5a79147, 
-    0x06ca6351, 0x14292967, 0x27b70a85, 0x2e1b2138, 0x4d2c6dfc, 0x53380d13, 
-    0x650a7354, 0x766a0abb, 0x81c2c92e, 0x92722c85, 0xa2bfe8a1, 0xa81a664b, 
-    0xc24b8b70, 0xc76c51a3, 0xd192e819, 0xd6990624, 0xf40e3585, 0x106aa070, 
-    0x19a4c116, 0x1e376c08, 0x2748774c, 0x34b0bcb5, 0x391c0cb3, 0x4ed8aa4a, 
-    0x5b9cca4f, 0x682e6ff3, 0x748f82ee, 0x78a5636f, 0x84c87814, 0x8cc70208, 
-    0x90befffa, 0xa4506ceb, 0xbef9a3f7, 0xc67178f2 };
+  private static final int K[] = { 0x428a2f98, 0x71374491, 0xb5c0fbcf, 0xe9b5dba5, 0x3956c25b, 0x59f111f1, 0x923f82a4, 0xab1c5ed5, 0xd807aa98, 0x12835b01, 0x243185be, 0x550c7dc3, 0x72be5d74, 0x80deb1fe, 0x9bdc06a7, 0xc19bf174, 0xe49b69c1, 0xefbe4786, 0x0fc19dc6, 0x240ca1cc, 0x2de92c6f, 0x4a7484aa, 0x5cb0a9dc, 0x76f988da, 0x983e5152, 0xa831c66d, 0xb00327c8, 0xbf597fc7, 0xc6e00bf3, 0xd5a79147, 0x06ca6351, 0x14292967, 0x27b70a85, 0x2e1b2138, 0x4d2c6dfc, 0x53380d13, 0x650a7354, 0x766a0abb, 0x81c2c92e, 0x92722c85, 0xa2bfe8a1, 0xa81a664b, 0xc24b8b70, 0xc76c51a3, 0xd192e819, 0xd6990624, 0xf40e3585, 0x106aa070, 0x19a4c116, 0x1e376c08, 0x2748774c, 0x34b0bcb5, 0x391c0cb3, 0x4ed8aa4a, 0x5b9cca4f, 0x682e6ff3, 0x748f82ee, 0x78a5636f, 0x84c87814, 0x8cc70208, 0x90befffa, 0xa4506ceb, 0xbef9a3f7, 0xc67178f2 };
 
   /** 8 32-bit words (interim result) */
   private final int[] context;
@@ -52,8 +47,7 @@ public class SHA256 implements Digest
   /**
    * Constructor SHA256
    */
-  public SHA256()
-  {
+  public SHA256() {
     this.context = new int[8];
     this.buffer = new int[64];
     this.buf = new byte[64];
@@ -70,12 +64,9 @@ public class SHA256 implements Digest
    * @param buf
    * @param off
    */
-  protected void coreDigest( byte[] buf, int off )
-  {
-    for( int i = 0; i < context.length; i++ )
-    {
-      for( int j = 0; j < 4; j++ )
-      {
+  protected void coreDigest( byte[] buf, int off ) {
+    for ( int i = 0; i < context.length; i++ ) {
+      for ( int j = 0; j < 4; j++ ) {
         buf[off + ( i * 4 + ( 3 - j ) )] = (byte)( context[i] >>> ( 8 * j ) );
       }
     }
@@ -87,8 +78,7 @@ public class SHA256 implements Digest
   /**
    * Method coreReset
    */
-  protected void coreReset()
-  {
+  protected void coreReset() {
     this.bufOff = 0;
     this.byteCount = 0;
 
@@ -112,20 +102,17 @@ public class SHA256 implements Digest
    * @param block
    * @param offset
    */
-  protected void coreUpdate( byte[] block, int offset )
-  {
+  protected void coreUpdate( byte[] block, int offset ) {
 
     int[] W = buffer;
 
     // extract the bytes into our working buffer
-    for( int i = 0; i < 16; i++ )
-    {
+    for ( int i = 0; i < 16; i++ ) {
       W[i] = ( block[offset++] ) << 24 | ( block[offset++] & 0xFF ) << 16 | ( block[offset++] & 0xFF ) << 8 | ( block[offset++] & 0xFF );
     }
 
     // expand
-    for( int i = 16; i < 64; i++ )
-    {
+    for ( int i = 16; i < 64; i++ ) {
       W[i] = sig1( W[i - 2] ) + W[i - 7] + sig0( W[i - 15] ) + W[i - 16];
     }
 
@@ -139,8 +126,7 @@ public class SHA256 implements Digest
     int h = context[7];
 
     // run 64 rounds
-    for( int i = 0; i < 64; i++ )
-    {
+    for ( int i = 0; i < 64; i++ ) {
       int T1 = h + Sig1( e ) + Ch( e, f, g ) + K[i] + W[i];
       int T2 = Sig0( a ) + Maj( a, b, c );
       h = g;
@@ -176,8 +162,7 @@ public class SHA256 implements Digest
    *
    * @return
    */
-  private final int Ch( int x, int y, int z )
-  {
+  private final int Ch( int x, int y, int z ) {
     return ( x & y ) ^ ( ~x & z );
   }
 
@@ -193,8 +178,7 @@ public class SHA256 implements Digest
    *
    * @return
    */
-  private final int Maj( int x, int y, int z )
-  {
+  private final int Maj( int x, int y, int z ) {
     return ( x & y ) ^ ( x & z ) ^ ( y & z );
   }
 
@@ -208,8 +192,7 @@ public class SHA256 implements Digest
    *
    * @return
    */
-  private final int Sig0( int x )
-  {
+  private final int Sig0( int x ) {
     return S( 2, x ) ^ S( 13, x ) ^ S( 22, x );
   }
 
@@ -223,8 +206,7 @@ public class SHA256 implements Digest
    *
    * @return
    */
-  private final int Sig1( int x )
-  {
+  private final int Sig1( int x ) {
     return S( 6, x ) ^ S( 11, x ) ^ S( 25, x );
   }
 
@@ -238,8 +220,7 @@ public class SHA256 implements Digest
    *
    * @return
    */
-  private final int sig0( int x )
-  {
+  private final int sig0( int x ) {
     return S( 7, x ) ^ S( 18, x ) ^ R( 3, x );
   }
 
@@ -253,8 +234,7 @@ public class SHA256 implements Digest
    *
    * @return
    */
-  private final int sig1( int x )
-  {
+  private final int sig1( int x ) {
     return S( 17, x ) ^ S( 19, x ) ^ R( 10, x );
   }
 
@@ -269,8 +249,7 @@ public class SHA256 implements Digest
    *
    * @return
    */
-  private final int R( int off, int x )
-  {
+  private final int R( int off, int x ) {
     return ( x >>> off );
   }
 
@@ -285,8 +264,7 @@ public class SHA256 implements Digest
    *
    * @return
    */
-  private final int S( int off, int x )
-  {
+  private final int S( int off, int x ) {
     return ( x >>> off ) | ( x << ( 32 - off ) );
   }
 
@@ -303,8 +281,7 @@ public class SHA256 implements Digest
    *
    * @return
    */
-  private int privateDigest( byte[] buf, int offset, int len, boolean reset )
-  {
+  private int privateDigest( byte[] buf, int offset, int len, boolean reset ) {
     // #ASSERT(this.bufOff < BLOCK_SIZE);
 
     this.buf[this.bufOff++] = (byte)0x80;
@@ -312,10 +289,8 @@ public class SHA256 implements Digest
     int lenOfBitLen = 8;
     int C = BLOCK_SIZE - lenOfBitLen;
 
-    if( this.bufOff > C )
-    {
-      while( this.bufOff < BLOCK_SIZE )
-      {
+    if ( this.bufOff > C ) {
+      while ( this.bufOff < BLOCK_SIZE ) {
         this.buf[this.bufOff++] = (byte)0x00;
       }
 
@@ -324,23 +299,20 @@ public class SHA256 implements Digest
       this.bufOff = 0;
     }
 
-    while( this.bufOff < C )
-    {
+    while ( this.bufOff < C ) {
       this.buf[this.bufOff++] = (byte)0x00;
     }
 
     long bitCount = byteCount * 8;
 
-    for( int i = 56; i >= 0; i -= 8 )
-    {
+    for ( int i = 56; i >= 0; i -= 8 ) {
       this.buf[this.bufOff++] = (byte)( bitCount >>> ( i ) );
     }
 
     coreUpdate( this.buf, 0 );
     coreDigest( buf, offset );
 
-    if( reset )
-    {
+    if ( reset ) {
       coreReset();
     }
 
@@ -357,10 +329,8 @@ public class SHA256 implements Digest
    * @param digest int[] into which to place n elements
    * @param offset index of first of the n elements
    */
-  public void extract( int[] digest, int offset )
-  {
-    for( int i = 0; i < context.length; i++ )
-    {
+  public void extract( int[] digest, int offset ) {
+    for ( int i = 0; i < context.length; i++ ) {
       digest[i + offset] = context[i];
     }
   }
@@ -374,14 +344,12 @@ public class SHA256 implements Digest
    *
    * @param b byte to add
    */
-  public void update( byte b )
-  {
+  public void update( byte b ) {
 
     byteCount += 1;
     buf[bufOff++] = b;
 
-    if( bufOff == BLOCK_SIZE )
-    {
+    if ( bufOff == BLOCK_SIZE ) {
       coreUpdate( buf, 0 );
 
       bufOff = 0;
@@ -399,14 +367,12 @@ public class SHA256 implements Digest
    * @param offset start byte
    * @param length number of bytes to hash
    */
-  public void update( byte[] input, int offset, int length )
-  {
+  public void update( byte[] input, int offset, int length ) {
     byteCount += length;
 
     int todo;
 
-    while( length >= ( todo = BLOCK_SIZE - this.bufOff ) )
-    {
+    while ( length >= ( todo = BLOCK_SIZE - this.bufOff ) ) {
       System.arraycopy( input, offset, this.buf, this.bufOff, todo );
       coreUpdate( this.buf, 0 );
 
@@ -428,8 +394,7 @@ public class SHA256 implements Digest
    *
    * @param data
    */
-  public void update( byte[] data )
-  {
+  public void update( byte[] data ) {
     update( data, 0, data.length );
   }
 
@@ -441,8 +406,7 @@ public class SHA256 implements Digest
    *
    * @return the byte array result
    */
-  public byte[] digest()
-  {
+  public byte[] digest() {
     byte[] tmp = new byte[HASH_SIZE];
     privateDigest( tmp, 0, HASH_SIZE, true );
 
@@ -459,8 +423,7 @@ public class SHA256 implements Digest
    * @param offset
    * @param reset If true, the hash function is reinitialized
    */
-  public void digest( boolean reset, byte[] buffer, int offset )
-  {
+  public void digest( boolean reset, byte[] buffer, int offset ) {
     privateDigest( buf, offset, buffer.length, true );
   }
 
@@ -472,8 +435,7 @@ public class SHA256 implements Digest
    *
    * @return
    */
-  public final int digestSize()
-  {
+  public final int digestSize() {
     return HASH_SIZE << 3;
   }
 
@@ -487,12 +449,10 @@ public class SHA256 implements Digest
    *
    * @return
    */
-  public String doHash( String s )
-  {
+  public String doHash( String s ) {
     coreReset();
 
-    for( int i = 0; i < s.length(); i++ )
-    {
+    for ( int i = 0; i < s.length(); i++ ) {
       this.update( (byte)s.charAt( i ) );
     }
 
@@ -508,30 +468,21 @@ public class SHA256 implements Digest
    *
    * @param args
    */
-  public static void main( String[] args )
-  {
+  public static void main( String[] args ) {
     byte[] buffer = new byte[1024];
     SHA256 s = new SHA256();
 
-    try
-    {
-      while( true )
-      {
+    try {
+      while ( true ) {
         int rc = System.in.read( buffer );
 
-        if( rc > 0 )
-        {
+        if ( rc > 0 ) {
           s.update( buffer, 0, rc );
-        }
-        else
-        {
+        } else {
           break;
         }
       }
-    }
-    catch( java.io.IOException e )
-    {
-    }
+    } catch ( java.io.IOException e ) {}
 
     byte[] rv = s.digest();
     System.out.println( ByteUtil.bytesToHex( rv ) );

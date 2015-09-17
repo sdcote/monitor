@@ -1,7 +1,13 @@
 /*
- * $Id: ListEnumeration.java,v 1.1 2005/03/29 14:10:36 cotes Exp $
+ * Copyright (c) 2003 Stephan D. Cote' - All rights reserved.
  * 
- * Copyright (C) 2003 Stephan D. Cote' - All rights reserved.
+ * This program and the accompanying materials are made available under the 
+ * terms of the MIT License which accompanies this distribution, and is 
+ * available at http://creativecommons.org/licenses/MIT/
+ *
+ * Contributors:
+ *   Stephan D. Cote 
+ *      - Initial concept and initial implementation
  */
 package coyote.commons.list;
 

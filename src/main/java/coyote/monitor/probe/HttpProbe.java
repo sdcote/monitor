@@ -10,6 +10,7 @@ import coyote.commons.ByteUtil;
 import coyote.commons.ExceptionUtil;
 import coyote.commons.StringUtil;
 import coyote.commons.UriUtil;
+import coyote.commons.network.http.HttpMessage;
 import coyote.commons.network.http.HttpRequest;
 import coyote.commons.network.http.HttpResponse;
 import coyote.commons.security.MD5;
@@ -140,6 +141,7 @@ public class HttpProbe extends AbstractProbe {
     retval.setType( StringUtil.getLocalJavaName( getClass().getName() ) );
 
     HttpRequest request = new HttpRequest();
+    request.setHeader( HttpMessage.CONNECTION, HttpMessage.CLOSE );
 
     if ( uri != null ) {
       // Place the target URI in our current metric
@@ -242,7 +244,7 @@ public class HttpProbe extends AbstractProbe {
     //cfg.put( HttpProbe.DESTINATION_URI, "http://www.tripod.lycos.com:80" );
     //cfg.put( HttpProbe.DESTINATION_URI, "http://www.tripod.lycos.com/adm/unknown_host.html" );
     // cfg.put( HttpProbe.DESTINATION_URI, "http://www.google.com" );
-    cfg.put( HttpProbe.DESTINATION_URI, "http://dev14122.service-now.com" );
+    cfg.put( HttpProbe.DESTINATION_URI, "http://spot.nwie.net" );
 
     // Show the configuration
     Log.info( cfg.toFormattedString() );

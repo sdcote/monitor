@@ -1,18 +1,20 @@
 /*
- * $Id: HMAC_MD5.java,v 1.3 2004/04/16 12:15:37 cotes Exp $
+ * Copyright (c) 2003 Stephan D. Cote' - All rights reserved.
+ * 
+ * This program and the accompanying materials are made available under the 
+ * terms of the MIT License which accompanies this distribution, and is 
+ * available at http://creativecommons.org/licenses/MIT/
  *
- * Copyright (C) 2003 Stephan D. Cote' - All rights reserved.
+ * Contributors:
+ *   Stephan D. Cote 
+ *      - Initial implementation
  */
 package coyote.commons.security;
 
 /**
  * JAVA translation of the hmac_md5() function from RFC 2104.
- *
- * @author Stephan D. Cote' - Enterprise Architecture
- * @version $Revision: 1.3 $
  */
-public class HMAC_MD5
-{
+public class HMAC_MD5 {
 
   /** Digest to be returned upon completion of the HMAC_MD5. */
   private byte digest[];
@@ -34,13 +36,11 @@ public class HMAC_MD5
    *
    * @param key
    */
-  HMAC_MD5(byte key[])
-  {
+  HMAC_MD5( byte key[] ) {
     int kLen = key.length;
 
     // if key is longer than 64 bytes reset it to key=MD5(key)
-    if( kLen > 64 )
-    {
+    if ( kLen > 64 ) {
       MD5 md5 = new MD5();
       md5.update( key );
 
@@ -55,8 +55,7 @@ public class HMAC_MD5
     System.arraycopy( key, 0, kOpad, 0, kLen );
 
     // XOR key with ipad and opad values
-    for( int i = 0; i < 64; i++ )
-    {
+    for ( int i = 0; i < 64; i++ ) {
       kIpad[i] ^= 0x36;
       kOpad[i] ^= 0x5c;
     }
@@ -70,8 +69,7 @@ public class HMAC_MD5
   /**
    * Clear the HMAC_MD5 object.
    */
-  public void clear()
-  {
+  public void clear() {
     innerMD5 = new MD5();
 
     innerMD5.update( kIpad ); // Intialize the inner pad.
@@ -87,8 +85,7 @@ public class HMAC_MD5
    *
    * @param text Text to process
    */
-  public void addData( byte text[] )
-  {
+  public void addData( byte text[] ) {
     addData( text, 0, text.length );
   }
 
@@ -102,8 +99,7 @@ public class HMAC_MD5
    * @param textStart Start position of text in text buffer.
    * @param textLen Length of text to use from text buffer.
    */
-  public void addData( byte text[], int textStart, int textLen )
-  {
+  public void addData( byte text[], int textStart, int textLen ) {
     innerMD5.update( text, textStart, textLen ); // then text of datagram.
   }
 
@@ -115,8 +111,7 @@ public class HMAC_MD5
    *
    * @return
    */
-  public byte[] sign()
-  {
+  public byte[] sign() {
     MD5 md5;
     // the HMAC_MD5 transform looks like:
     // MD5(K XOR opad, MD5(K XOR ipad, text))
@@ -150,27 +145,22 @@ public class HMAC_MD5
    *
    * @return True if the signature matches the calculated hash.
    */
-  public boolean verify( byte signature[] )
-  {
+  public boolean verify( byte signature[] ) {
     // The digest may not have been calculated. If it's null, force a
     // calculation.
-    if( digest == null )
-    {
+    if ( digest == null ) {
       sign();
     }
 
     int sigLen = signature.length;
     int digLen = digest.length;
 
-    if( sigLen != digLen )
-    {
+    if ( sigLen != digLen ) {
       return false; // Different lengths, not a good sign.
     }
 
-    for( int i = 0; i < sigLen; i++ )
-    {
-      if( signature[i] != digest[i] )
-      {
+    for ( int i = 0; i < sigLen; i++ ) {
+      if ( signature[i] != digest[i] ) {
         return false; // Mismatch. Misfortune.
       }
     }
@@ -186,11 +176,9 @@ public class HMAC_MD5
    *
    * @return a hex representation of the MD5 digest.
    */
-  public String toString()
-  {
+  public String toString() {
     // If not already calculated, do so.
-    if( digest == null )
-    {
+    if ( digest == null ) {
       sign();
     }
 
@@ -198,8 +186,7 @@ public class HMAC_MD5
     final String hex = "0123456789ABCDEF";
     byte b[] = digest;
 
-    for( int i = 0; i < 16; i++ )
-    {
+    for ( int i = 0; i < 16; i++ ) {
       int c = ( ( b[i] ) >>> 4 ) & 0xf;
       r.append( hex.charAt( c ) );
 
@@ -219,8 +206,7 @@ public class HMAC_MD5
    *
    * @param arg
    */
-  public static void main( String arg[] )
-  {
+  public static void main( String arg[] ) {
     String expectedHash;
     byte digest[];
     HMAC_MD5 hm;

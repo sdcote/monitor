@@ -1,7 +1,13 @@
 /*
- * $Id: HttpRequest.java,v 1.4 2004/04/16 12:23:49 cotes Exp $
+ * Copyright (c) 2003 Stephan D. Cote' - All rights reserved.
+ * 
+ * This program and the accompanying materials are made available under the 
+ * terms of the MIT License which accompanies this distribution, and is 
+ * available at http://creativecommons.org/licenses/MIT/
  *
- * Copyright (C) 2003 Stephan D. Cote' - All rights reserved.
+ * Contributors:
+ *   Stephan D. Cote 
+ *      - Initial concept and initial implementation
  */
 package coyote.commons.network.http;
 
@@ -301,8 +307,8 @@ public class HttpRequest extends HttpMessage {
    * represented properly in some cases.
    *
    * <p>Consider posting a PNG image to a server for storage. This method will
-   * convert the binary PNG file to a string (well, actualy a string of garbled
-   * text) and not be in the proper format.<p>
+   * convert the binary PNG file to a string (well, actually a string of 
+   * garbled text) and not be in the proper format.</p>
    *
    * @return A String representing the entire request.
    */

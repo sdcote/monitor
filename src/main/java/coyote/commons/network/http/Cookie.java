@@ -1,7 +1,13 @@
 /*
- * $Id: Cookie.java,v 1.3 2004/11/02 20:57:22 cotes Exp $
+ * Copyright (c) 2003 Stephan D. Cote' - All rights reserved.
+ * 
+ * This program and the accompanying materials are made available under the 
+ * terms of the MIT License which accompanies this distribution, and is 
+ * available at http://creativecommons.org/licenses/MIT/
  *
- * Copyright (C) 2003 Stephan D. Cote' - All rights reserved.
+ * Contributors:
+ *   Stephan D. Cote 
+ *      - Initial concept and initial implementation
  */
 package coyote.commons.network.http;
 
@@ -43,8 +49,7 @@ import coyote.loader.log.Log;
  * cookie specifications. By default, cookies are created using Version 0 to
  * ensure the best interoperability.</p>
  */
-public class Cookie implements Cloneable
-{
+public class Cookie implements Cloneable {
   private String name = null;
   private String value = null;
   private String comment = null;
@@ -77,17 +82,13 @@ public class Cookie implements Cloneable
    * @param value A String specifying the value of the cookie
    *
    */
-  public Cookie( String name, String value )
-  {
+  public Cookie( String name, String value ) {
     maxAge = -1;
     version = 0;
 
-    if( !isToken( name ) || name.equalsIgnoreCase( "Comment" ) || name.equalsIgnoreCase( "Discard" ) || name.equalsIgnoreCase( "Domain" ) || name.equalsIgnoreCase( "Expires" ) || name.equalsIgnoreCase( "Max-Age" ) || name.equalsIgnoreCase( "Path" ) || name.equalsIgnoreCase( "Secure" ) || name.equalsIgnoreCase( "Version" ) )
-    {
+    if ( !isToken( name ) || name.equalsIgnoreCase( "Comment" ) || name.equalsIgnoreCase( "Discard" ) || name.equalsIgnoreCase( "Domain" ) || name.equalsIgnoreCase( "Expires" ) || name.equalsIgnoreCase( "Max-Age" ) || name.equalsIgnoreCase( "Path" ) || name.equalsIgnoreCase( "Secure" ) || name.equalsIgnoreCase( "Version" ) ) {
       throw new IllegalArgumentException( "Cookie name '" + name + "' contains invalid characters, or is a reserved token" );
-    }
-    else
-    {
+    } else {
       this.name = name;
       this.value = value;
 
@@ -106,8 +107,7 @@ public class Cookie implements Cloneable
    *
    * @param purpose a String specifying the comment to display to the user
    */
-  public void setComment( String purpose )
-  {
+  public void setComment( String purpose ) {
     comment = purpose;
   }
 
@@ -120,8 +120,7 @@ public class Cookie implements Cloneable
    *
    * @return a String containing the comment, or null if none
    */
-  public String getComment()
-  {
+  public String getComment() {
     return comment;
   }
 
@@ -139,8 +138,7 @@ public class Cookie implements Cloneable
    *
    * @param pattern
    */
-  public void setDomain( String pattern )
-  {
+  public void setDomain( String pattern ) {
     domain = pattern.toLowerCase();
   }
 
@@ -153,8 +151,7 @@ public class Cookie implements Cloneable
    *
    * @return a String containing the domain name
    */
-  public String getDomain()
-  {
+  public String getDomain() {
     return domain;
   }
 
@@ -174,8 +171,7 @@ public class Cookie implements Cloneable
    *
    * @param expiry an integer specifying the maximum age of the cookie in seconds; if negative, means the cookie is not stored; if zero, deletes the cookie
    */
-  public void setMaxAge( int expiry )
-  {
+  public void setMaxAge( int expiry ) {
     maxAge = expiry;
   }
 
@@ -188,8 +184,7 @@ public class Cookie implements Cloneable
    *
    * @return an integer specifying the maximum age of the cookie in seconds; if negative, means the cookie persists until browser shutdown
    */
-  public int getMaxAge()
-  {
+  public int getMaxAge() {
     return maxAge;
   }
 
@@ -201,8 +196,8 @@ public class Cookie implements Cloneable
    * cookie.
    *
    * <p>The cookie is visible to all the pages in the directory you specify,
-   * and all the pages in that directory's subdirectories. A cookie's path must
-   * include the servlet that set the cookie, for example, /catalog, which
+   * and all the pages in that directory's sub-directories. A cookie's path 
+   * must include the servlet that set the cookie, for example, /catalog, which
    * makes the cookie visible to all directories on the server under
    * /catalog.</p>
    *
@@ -211,8 +206,7 @@ public class Cookie implements Cloneable
    *
    * @param uri a String specifying a path
    */
-  public void setPath( String uri )
-  {
+  public void setPath( String uri ) {
     path = uri;
   }
 
@@ -226,8 +220,7 @@ public class Cookie implements Cloneable
    * @return a String specifying a path that contains a servlet name, for
    *         example, /catalog
    */
-  public String getPath()
-  {
+  public String getPath() {
     return path;
   }
 
@@ -239,10 +232,9 @@ public class Cookie implements Cloneable
    * secure protocol, such as HTTPS or SSL.
    *
    * @param flag if true, sends the cookie from the browser to the server using
-   *          only when using a secure protocol; if false, sent on any protocol.
+   *        only when using a secure protocol; if false, sent on any protocol.
    */
-  public void setSecure( boolean flag )
-  {
+  public void setSecure( boolean flag ) {
     secure = flag;
   }
 
@@ -255,8 +247,7 @@ public class Cookie implements Cloneable
    *
    * @return true if the browser can use any standard protocol; otherwise, false
    */
-  public boolean getSecure()
-  {
+  public boolean getSecure() {
     return secure;
   }
 
@@ -270,8 +261,7 @@ public class Cookie implements Cloneable
    *
    * @return a String specifying the cookie's name
    */
-  public String getName()
-  {
+  public String getName() {
     return name;
   }
 
@@ -292,8 +282,7 @@ public class Cookie implements Cloneable
    *
    * @param val
    */
-  public void setValue( String val )
-  {
+  public void setValue( String val ) {
     value = val;
   }
 
@@ -305,8 +294,7 @@ public class Cookie implements Cloneable
    *
    * @return a String containing the cookie's present value
    */
-  public String getValue()
-  {
+  public String getValue() {
     return value;
   }
 
@@ -322,8 +310,7 @@ public class Cookie implements Cloneable
    *
    * @return 0 if the cookie complies with the original Netscape specification; 1 if the cookie complies with RFC 2109
    */
-  public int getVersion()
-  {
+  public int getVersion() {
     return version;
   }
 
@@ -337,8 +324,7 @@ public class Cookie implements Cloneable
    * <p>Version 0 complies with the original Netscape cookie specification and
    * is the default.</p>
    */
-  public void setVersion0()
-  {
+  public void setVersion0() {
     version = 0;
   }
 
@@ -352,8 +338,7 @@ public class Cookie implements Cloneable
    * <p>Since RFC 2109 is still somewhat new, consider version 1 as
    * experimental; do not use it yet on production sites.</p>
    */
-  public void setVersion1()
-  {
+  public void setVersion1() {
     version = 1;
   }
 
@@ -368,14 +353,11 @@ public class Cookie implements Cloneable
    *
    * @return
    */
-  private boolean isToken( String name )
-  {
-    for( int i = 0; i < name.length(); i++ )
-    {
+  private boolean isToken( String name ) {
+    for ( int i = 0; i < name.length(); i++ ) {
       char c = name.charAt( i );
 
-      if( ( c < ' ' ) || ( c >= '\177' ) || ( delims.indexOf( c ) != -1 ) )
-      {
+      if ( ( c < ' ' ) || ( c >= '\177' ) || ( delims.indexOf( c ) != -1 ) ) {
         return false;
       }
     }
@@ -391,14 +373,10 @@ public class Cookie implements Cloneable
    *
    * @return
    */
-  public Object clone()
-  {
-    try
-    {
+  public Object clone() {
+    try {
       return super.clone();
-    }
-    catch( CloneNotSupportedException clonenotsupportedexception )
-    {
+    } catch ( CloneNotSupportedException clonenotsupportedexception ) {
       throw new RuntimeException( clonenotsupportedexception.getMessage() );
     }
   }
@@ -412,8 +390,7 @@ public class Cookie implements Cloneable
    * @return the string representing this cookie suitable for placing in a HTTP
    *         header according to the currently set version.
    */
-  public String toString()
-  {
+  public String toString() {
     return toString( this );
   }
 
@@ -432,8 +409,7 @@ public class Cookie implements Cloneable
    * @return the string representing the cookie suitable for placing in a HTTP
    *         header.
    */
-  public static String toString( Cookie cookie )
-  {
+  public static String toString( Cookie cookie ) {
     return ( cookie.getVersion() != 0 ) ? toStringVersion1( cookie ) : toStringVersion0( cookie );
   }
 
@@ -448,29 +424,24 @@ public class Cookie implements Cloneable
    * @return the string representing the cookie suitable for placing in a HTTP
    *         header.
    */
-  private static String toStringVersion0( Cookie cookie )
-  {
+  private static String toStringVersion0( Cookie cookie ) {
     StringBuffer stringbuffer = new StringBuffer();
     stringbuffer.append( cookie.getName() ).append( '=' ).append( cookie.getValue() );
 
-    if( cookie.getMaxAge() >= 0 )
-    {
+    if ( cookie.getMaxAge() >= 0 ) {
       Date date = new Date( (long)( cookie.getMaxAge() * 1000 ) + System.currentTimeMillis() );
       stringbuffer.append( "; expires=" ).append( HttpMessage.dateFormatter2.format( date ) );
     }
 
-    if( cookie.getPath() != null )
-    {
+    if ( cookie.getPath() != null ) {
       stringbuffer.append( "; path=" ).append( cookie.getPath() );
     }
 
-    if( cookie.getDomain() != null )
-    {
+    if ( cookie.getDomain() != null ) {
       stringbuffer.append( "; domain=" ).append( cookie.getDomain() );
     }
 
-    if( cookie.getSecure() )
-    {
+    if ( cookie.getSecure() ) {
       stringbuffer.append( "; secure" );
     }
 
@@ -488,34 +459,28 @@ public class Cookie implements Cloneable
    * @return the string representing the cookie suitable for placing in a HTTP
    *         header.
    */
-  private static String toStringVersion1( Cookie cookie )
-  {
+  private static String toStringVersion1( Cookie cookie ) {
     StringBuffer stringbuffer = new StringBuffer();
     stringbuffer.append( cookie.getName() ).append( '=' ).append( cookie.getValue() );
     stringbuffer.append( "; Version=1" );
 
-    if( cookie.getMaxAge() >= 0 )
-    {
+    if ( cookie.getMaxAge() >= 0 ) {
       stringbuffer.append( "; Max-Age=\"" ).append( cookie.getMaxAge() ).append( '"' );
     }
 
-    if( cookie.getComment() != null )
-    {
+    if ( cookie.getComment() != null ) {
       stringbuffer.append( "; Comment=\"" ).append( cookie.getComment() ).append( '"' );
     }
 
-    if( cookie.getPath() != null )
-    {
+    if ( cookie.getPath() != null ) {
       stringbuffer.append( "; Path=\"" ).append( cookie.getPath() ).append( '"' );
     }
 
-    if( cookie.getDomain() != null )
-    {
+    if ( cookie.getDomain() != null ) {
       stringbuffer.append( "; Domain=\"" ).append( cookie.getDomain() ).append( '"' );
     }
 
-    if( cookie.getSecure() )
-    {
+    if ( cookie.getSecure() ) {
       stringbuffer.append( "; Secure" );
     }
 
@@ -532,53 +497,36 @@ public class Cookie implements Cloneable
    *
    * @return
    */
-  public static Cookie[] parse( String data )
-  {
-    try
-    {
+  public static Cookie[] parse( String data ) {
+    try {
 
-      if( data.startsWith( "Cookie: " ) )
-      {
+      if ( data.startsWith( "Cookie: " ) ) {
         // Complete standard cookie header was passed to us
         String body = data.substring( 8 );
 
-        if( body.indexOf( "Version=" ) > 0 )
-        {
+        if ( body.indexOf( "Version=" ) > 0 ) {
           return parse1( body );
-        }
-        else
-        {
+        } else {
           return parse0( body );
         }
-      }
-      else if( data.startsWith( "Cookie2: " ) )
-      {
+      } else if ( data.startsWith( "Cookie2: " ) ) {
         // Complete RFC2965 cookie header was passed to us
         String body = data.substring( 9 );
         return parse1( body );
-      }
-      else if( data.indexOf( '=' ) > 1 )
-      {
+      } else if ( data.indexOf( '=' ) > 1 ) {
         // Apparently just the body of the cookie was passed to us
-        if( data.indexOf( "Version=" ) > 0 )
-        {
+        if ( data.indexOf( "Version=" ) > 0 ) {
           return parse1( data );
-        }
-        else
-        {
+        } else {
           return parse0( data );
         }
-      }
-      else
-      {
+      } else {
         // Not a cookie we understand
         Log.debug( "The data of '" + data + "' is not a cookie" );
 
         return null;
       }
-    }
-    catch( Exception exception )
-    {
+    } catch ( Exception exception ) {
       exception.printStackTrace();
     }
 
@@ -595,15 +543,12 @@ public class Cookie implements Cloneable
    *
    * @return
    */
-  private static Cookie[] parse0( String data )
-  {
+  private static Cookie[] parse0( String data ) {
     Cookie[] retval = new Cookie[0];
     StringParser parser = new StringParser( data.trim(), ";," );
 
-    try
-    {
-      do
-      {
+    try {
+      do {
         // Skip all the whitespace before the token
         parser.skipWhitespace();
 
@@ -615,27 +560,22 @@ public class Cookie implements Cloneable
         // Log.debug("parse0 - value token ='"+val+"' position: "+parser.getPosition());
 
         // If we are not at the end for the line...
-        if( !parser.eof() )
-        {
+        if ( !parser.eof() ) {
           // ...read past the delimiter that gave us the value token
           parser.read();
         }
 
-        if( ( token != null ) && ( token.length() > 0 ) )
-        {
+        if ( ( token != null ) && ( token.length() > 0 ) ) {
           // add the cookie to the return value array
           retval = (Cookie[])ArrayUtil.addElement( retval, new Cookie( token, val ) );
         }
 
-        if( parser.eof() )
-        {
+        if ( parser.eof() ) {
           break;
         }
       }
-      while( true );
-    }
-    catch( Exception ex )
-    {
+      while ( true );
+    } catch ( Exception ex ) {
       Log.warn( "Error parsing cookie " + ex.getMessage() );
       Log.debug( "Cookie='" + data + "' at " + parser.getPosition() );
     }
@@ -653,16 +593,13 @@ public class Cookie implements Cloneable
    *
    * @return
    */
-  private static Cookie[] parse1( String data )
-  {
+  private static Cookie[] parse1( String data ) {
     Cookie[] retval = new Cookie[0];
 
     StringParser parser = new StringParser( data.trim() );
 
-    try
-    {
-      do
-      {
+    try {
+      do {
         String token = parser.readToken();
         parser.readTo( '=' );
 
@@ -670,18 +607,12 @@ public class Cookie implements Cloneable
         String path = null;
         String domain = null;
 
-        if( token.equals( "$Path" ) )
-        {
+        if ( token.equals( "$Path" ) ) {
           path = attr;
-        }
-        else
-        {
-          if( token.equals( "$Domain" ) )
-          {
+        } else {
+          if ( token.equals( "$Domain" ) ) {
             domain = attr;
-          }
-          else
-          {
+          } else {
             Cookie cookie = new Cookie( token, attr );
             cookie.setVersion1();
             cookie.setPath( path );
@@ -691,19 +622,14 @@ public class Cookie implements Cloneable
           }
         }
 
-        if( !parser.eof() )
-        {
+        if ( !parser.eof() ) {
           parser.readTo( ';' );
-        }
-        else
-        {
+        } else {
           return retval;
         }
       }
-      while( true );
-    }
-    catch( Exception ex )
-    {
+      while ( true );
+    } catch ( Exception ex ) {
       Log.warn( "Error parsing cookie " + ex.getMessage() );
       Log.debug( "Cookie='" + data + "' at " + parser.getPosition() );
     }

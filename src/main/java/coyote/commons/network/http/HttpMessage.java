@@ -1,7 +1,13 @@
 /*
- * $Id: HttpMessage.java,v 1.3 2004/04/16 12:23:49 cotes Exp $
+ * Copyright (c) 2003 Stephan D. Cote' - All rights reserved.
+ * 
+ * This program and the accompanying materials are made available under the 
+ * terms of the MIT License which accompanies this distribution, and is 
+ * available at http://creativecommons.org/licenses/MIT/
  *
- * Copyright (C) 2003 Stephan D. Cote' - All rights reserved.
+ * Contributors:
+ *   Stephan D. Cote 
+ *      - Initial concept and initial implementation
  */
 package coyote.commons.network.http;
 
@@ -30,172 +36,117 @@ import coyote.loader.log.Log;
 /**
  * Represents the base class of all HTTP messages.
  */
-public class HttpMessage
-{
+public class HttpMessage {
 
   /** This is the output stream we use to generate the body of the HttpMessage */
   protected ByteArrayOutputStream output = new ByteArrayOutputStream();
 
   /**
-   * This is the input stream from which we can read the reaminder of the
+   * This is the input stream from which we can read the remainder of the
    * message
    */
   protected InputStream input = null;
 
-  /** Field CHARSET */
   public static final String CHARSET = "charset=";
 
-  /** Field CONTENT_LENGTH */
   public static final String CONTENT_LENGTH = "Content-Length";
 
-  /** Field CONTENT_ENCODING */
   public static final String CONTENT_ENCODING = "Content-Encoding";
 
-  /** Field CONTENT_TYPE */
   public static final String CONTENT_TYPE = "Content-Type";
 
-  /** Field CONTENT_LOCATION */
   public static final String CONTENT_LOCATION = "Content-Location";
 
-  /** Field CONTENT_ID */
   public static final String CONTENT_ID = "Content-ID";
 
-  /** Field EXPECT_HEADER */
   public static final String EXPECT_HEADER = "Expect";
 
-  /** Field ACCEPT_LANGUAGE */
   public static final String ACCEPT_LANGUAGE = "Accept-Language";
 
-  /** Field ACCEPT */
   public static final String ACCEPT = "Accept";
 
-  /** Field ACCEPT_ENCODING */
   public static final String ACCEPT_ENCODING = "Accept-Encoding";
 
-  /** Field KEEP_ALIVE */
-  public static final String KEEP_ALIVE = "Keep-Alive";
-
-  /** Field MULTIPART_CONTENT_TYPE */
   public static final String MULTIPART_CONTENT_TYPE = "Multipart/Related";
 
-  /** Field HOST */
   public static final String HOST = "Host";
 
-  /** Field RANGE */
   public static final String RANGE = "Range";
 
-  /** Field CONNECTION */
   public static final String CONNECTION = "Connection";
-
-  /** Field CLOSE */
+  public static final String KEEP_ALIVE = "Keep-Alive";
   public static final String CLOSE = "Close";
 
-  /** Field SERVER */
   public static final String SERVER = "Server";
 
-  /** Field DEFAULT_CHARACTER_ENCODING */
   public static final String DEFAULT_CHARACTER_ENCODING = "ISO-8859-1";
 
-  /** Field HTTP_1_0 */
   public static final String HTTP_1_0 = "HTTP/1.0";
 
-  /** Field HTTP_1_1 */
   public static final String HTTP_1_1 = "HTTP/1.1";
 
-  /** Field COOKIE_LISTENER */
   public static final String COOKIE_LISTENER = "cookieListener";
 
-  /** Field SET_COOKIE_0 */
   public static final String SET_COOKIE_0 = "Set-Cookie";
 
-  /** Field SET_COOKIE_1 */
   public static final String SET_COOKIE_1 = "Set-Cookie2";
 
-  /** Field COOKIE */
   public static final String COOKIE = "Cookie";
 
-  /** Field USER_AGENT */
   public static final String USER_AGENT = "User-Agent";
 
-  /** Field TEXT_PLAIN */
   public static final String TEXT_PLAIN = "text/plain";
 
-  /** Field TEXT_XML */
   public static final String TEXT_XML = "text/xml";
 
-  /** Field TEXT_XML_UTF_8 */
   public static final String TEXT_XML_UTF_8 = "text/xml; charset=UTF-8";
 
-  /** Field TEXT_HTML_UTF_8 */
   public static final String TEXT_HTML_UTF_8 = "text/html; charset=UTF-8";
 
-  /** Field TEXT_HTML */
   public static final String TEXT_HTML = "text/html";
 
-  /** Field POST */
   public static final String POST = "POST";
 
-  /** Field GET */
   public static final String GET = "GET";
 
-  /** Field DATE */
   public static final String DATE = "Date";
 
-  /** Field DEFAULT_HTTP_PORT */
   public static final int DEFAULT_HTTP_PORT = 80;
 
-  /** Field DEFAULT_HTTPS_PORT */
   public static final int DEFAULT_HTTPS_PORT = 443;
 
-  /** Field AUTHORIZATION */
   public static final String AUTHORIZATION = "Authorization";
 
-  /** Field PROXY_AUTHORIZATION */
   public static final String PROXY_AUTHORIZATION = "Proxy-Authorization";
 
-  /** Field PROXY_CONNECTION */
   public static final String PROXY_CONNECTION = "Proxy-Connection";
 
-  /** Field BASIC */
   public static final String BASIC = "Basic";
 
-  /** Field WWW_AUTHENTICATE */
   public static final String WWW_AUTHENTICATE = "WWW-Authenticate";
 
-  /** Field CONNECT */
   public static final String CONNECT = "CONNECT";
 
-  /** Field OK */
   public static final String OK = "OK";
 
-  /** Field LAST_MODIFIED */
   public static final String LAST_MODIFIED = "Last-Modified";
 
-  /** Field ACCEPT_RANGES */
   public static final String ACCEPT_RANGES = "Accept-Ranges";
 
-  /** Field IF_MODIFIED_SINCE */
   public static final String IF_MODIFIED_SINCE = "If-Modified-Since";
 
-  /** Field IF_NONE_MATCH */
   public static final String IF_NONE_MATCH = "If-None-Match";
 
-  /** Field DEFAULT_MIME_TYPE */
   public static final String DEFAULT_MIME_TYPE = "text/plain";
 
-  /** Field TRANSFER_ENCODING */
   public static final String TRANSFER_ENCODING = "Transfer-Encoding";
 
-  /** Field CHUNKED */
   public static final String CHUNKED = "chunked";
 
-  /** Field MIME_BOUNDARY */
   public static final String MIME_BOUNDARY = "MIME_boundary";
 
-  /** Field MIME_VERSION */
   protected static final String MIME_VERSION = "MIME-Version";
 
-  /** Field DEFAULT_CONTENT_TYPE */
   public static final String DEFAULT_CONTENT_TYPE = TEXT_HTML;
 
   protected static final byte[] CONTINUATION_STATUS = "HTTP/1.1 100 Continue\r\n\r\n".getBytes();
@@ -216,8 +167,8 @@ public class HttpMessage
   private static final String NO_HEADERS[][] = new String[0][0];
   private static TimeZone gmt = TimeZone.getTimeZone( "GMT" );
   private static SimpleDateFormat dateFormatter1;
-  private static final Hashtable statusTable = new Hashtable();
-  private static final Hashtable mimeTypes = new Hashtable();
+  private static final Hashtable<Integer, String> statusTable = new Hashtable<Integer, String>();
+  private static final Hashtable<String, String> mimeTypes = new Hashtable<String, String>();
   private String HttpVersion = null;
   protected static SimpleDateFormat dateFormatter2;
   protected static SimpleDateFormat dateFormatter3;
@@ -232,8 +183,7 @@ public class HttpMessage
   /*
    * Static initializer
    */
-  static
-  {
+  static {
     dateFormatter1 = new SimpleDateFormat( "EEE, dd MMM yyyy HH:mm:ss z", Locale.US );
 
     dateFormatter1.setTimeZone( gmt );
@@ -452,8 +402,7 @@ public class HttpMessage
   /**
    * Constructor HttpMessage
    */
-  public HttpMessage()
-  {
+  public HttpMessage() {
     HttpVersion = HTTP_1_1;
     headers = NO_HEADERS;
   }
@@ -467,8 +416,7 @@ public class HttpMessage
    * @param statusCode
    * @param message
    */
-  private static void addStatusCode( int statusCode, String message )
-  {
+  private static void addStatusCode( int statusCode, String message ) {
     statusTable.put( new Integer( statusCode ), message );
   }
 
@@ -482,8 +430,7 @@ public class HttpMessage
    *
    * @return
    */
-  public static String getReasonPhrase( int statusCode )
-  {
+  public static String getReasonPhrase( int statusCode ) {
     return (String)statusTable.get( new Integer( statusCode ) );
   }
 
@@ -496,10 +443,8 @@ public class HttpMessage
    * @param extension, the type extension without a period(class, txt)
    * @param type, the mime type string
    */
-  public static void addMimeType( String extension, String type )
-  {
-    if( ( extension != null ) && ( type != null ) )
-    {
+  public static void addMimeType( String extension, String type ) {
+    if ( ( extension != null ) && ( type != null ) ) {
       mimeTypes.put( extension.toLowerCase(), type.toLowerCase() );
     }
   }
@@ -514,10 +459,8 @@ public class HttpMessage
    *
    * @return
    */
-  public static String getMimeType( String extension )
-  {
-    if( mimeTypes.containsKey( extension.toLowerCase() ) )
-    {
+  public static String getMimeType( String extension ) {
+    if ( mimeTypes.containsKey( extension.toLowerCase() ) ) {
       return (String)mimeTypes.get( extension.toLowerCase() );
     }
 
@@ -535,11 +478,9 @@ public class HttpMessage
    *
    * @return
    */
-  public static String getMimeType( String extension, String dflt )
-  {
-    if( mimeTypes.containsKey( extension.toLowerCase() ) )
-    {
-      return (String)mimeTypes.get( extension.toLowerCase() );
+  public static String getMimeType( String extension, String dflt ) {
+    if ( mimeTypes.containsKey( extension.toLowerCase() ) ) {
+      return mimeTypes.get( extension.toLowerCase() );
     }
 
     return dflt;
@@ -551,8 +492,7 @@ public class HttpMessage
   /**
    * Method startTimer
    */
-  protected void startTimer()
-  {
+  protected void startTimer() {
     abortTime = System.currentTimeMillis() + timeout;
   }
 
@@ -564,8 +504,7 @@ public class HttpMessage
    *
    * @return
    */
-  protected boolean isTimedOut()
-  {
+  protected boolean isTimedOut() {
     return System.currentTimeMillis() >= abortTime;
   }
 
@@ -579,8 +518,7 @@ public class HttpMessage
    *
    * @return
    */
-  private static boolean isHex( char c )
-  {
+  private static boolean isHex( char c ) {
     return Character.digit( c, 16 ) != -1;
   }
 
@@ -596,21 +534,18 @@ public class HttpMessage
    *
    * @return
    */
-  public static String fromHTTP( String token )
-  {
+  public static String fromHTTP( String token ) {
     token = token.replace( '+', ' ' );
 
     int i = token.indexOf( '%' );
 
-    if( i == -1 )
-    {
+    if ( i == -1 ) {
       return token;
     }
 
     int j = token.length();
 
-    if( ( i + 2 >= j ) || !isHex( token.charAt( i + 1 ) ) || !isHex( token.charAt( i + 2 ) ) )
-    {
+    if ( ( i + 2 >= j ) || !isHex( token.charAt( i + 1 ) ) || !isHex( token.charAt( i + 2 ) ) ) {
       return token;
     }
 
@@ -618,8 +553,7 @@ public class HttpMessage
     stringbuffer.append( token.substring( 0, i ) );
     stringbuffer.append( (char)Integer.parseInt( token.substring( i + 1, i + 3 ), 16 ) );
 
-    if( i + 3 < j )
-    {
+    if ( i + 3 < j ) {
       stringbuffer.append( decodeHtmlString( token.substring( i + 3 ) ) );
     }
 
@@ -638,25 +572,20 @@ public class HttpMessage
    *
    * @throws IOException
    */
-  public int readHeaders( InputStream in ) throws IOException
-  {
+  public int readHeaders( InputStream in ) throws IOException {
     int byteCount = 0;
 
-    if( in.available() > 0 )
-    {
-      do
-      {
+    if ( in.available() > 0 ) {
+      do {
         String line = StreamUtil.readLine( in );
 
-        if( ( line != null ) && ( line.length() > 0 ) )
-        {
+        if ( ( line != null ) && ( line.length() > 0 ) ) {
           // Increment the bytes received + CRLF sequence that ended the line
           byteCount += line.length() + 2;
 
           int i = line.indexOf( ':' );
 
-          if( i == -1 )
-          {
+          if ( i == -1 ) {
             throw new IOException( "illegal HTTP header: '" + line + "'" );
           }
 
@@ -671,16 +600,13 @@ public class HttpMessage
           Log.append( HTTP, getClass().getName() + "readHeaders Name=" + name + " Value=" + data );
 
           // If the header is a cookie...
-          if( name.equals( COOKIE ) )
-          {
+          if ( name.equals( COOKIE ) ) {
             // ...parse it into an array of cookie objects and place them in
             // the cookie jar
             cookieJar.addCookies( Cookie.parse( line ) );
           }
 
-        }
-        else
-        {
+        } else {
           // count the CRLF terminater that represents the empty line
           byteCount += 2;
 
@@ -688,7 +614,7 @@ public class HttpMessage
           return byteCount;
         }
       }
-      while( true );
+      while ( true );
     }
 
     return byteCount;
@@ -716,8 +642,7 @@ public class HttpMessage
    *
    * @throws IOException if the body could not be completly read in from the InputStream
    */
-  public int readBody( InputStream in ) throws IOException
-  {
+  public int readBody( InputStream in ) throws IOException {
     // tally how many bytes we receive
     int byteCount = 0;
 
@@ -732,25 +657,19 @@ public class HttpMessage
     long abortTime = System.currentTimeMillis() + getTimeout();
 
     // if we have a body to read or the length was not defined in the header...
-    if( expectedLength != 0 )
-    {
+    if ( expectedLength != 0 ) {
       // while what we have received so far is less than expected, or the
       // length of the body was not specified...
-      while( ( output.size() < expectedLength ) || ( expectedLength == -1 ) )
-      {
+      while ( ( output.size() < expectedLength ) || ( expectedLength == -1 ) ) {
         // If there is data "waiting on the wire"
-        if( in.available() > 0 )
-        {
+        if ( in.available() > 0 ) {
           byte[] chunk;
 
-          if( ( expectedLength < 0 ) || ( ( expectedLength > 0 ) && ( in.available() <= ( expectedLength - output.size() ) ) ) )
-          {
+          if ( ( expectedLength < 0 ) || ( ( expectedLength > 0 ) && ( in.available() <= ( expectedLength - output.size() ) ) ) ) {
             // make the chunk big enough for everything on the wire (or the
             // socket buffer)
             chunk = new byte[in.available()];
-          }
-          else
-          {
+          } else {
             // make the chunk only as big as we need to read the expected size
             chunk = new byte[expectedLength - output.size()];
           }
@@ -764,19 +683,15 @@ public class HttpMessage
           output.write( chunk, 0, bytesRead );
         }
 
-        if( expectedLength == -1 )
-        {
+        if ( expectedLength == -1 ) {
           // we have to block since we do not know how long the data will be,
           // and the only way determine if the stream is closed is to read the
           // next character.
           int c = in.read();
 
-          if( c > -1 )
-          {
+          if ( c > -1 ) {
             output.write( c );
-          }
-          else
-          {
+          } else {
             // -1 means the stream is closed, and probably the connection is
             // closed as well
             break;
@@ -784,8 +699,7 @@ public class HttpMessage
         }
 
         // If the time has passed for our read
-        if( System.currentTimeMillis() >= abortTime )
-        {
+        if ( System.currentTimeMillis() >= abortTime ) {
           // we timed-out!
           break;
         }
@@ -807,12 +721,9 @@ public class HttpMessage
    *
    * @throws IOException
    */
-  public void writeHeaders( OutputStream outputstream ) throws IOException
-  {
-    for( int i = 0; i < headers.length; i++ )
-    {
-      if( ( headers[i][0] != null ) && ( headers[i][1] != null ) )
-      {
+  public void writeHeaders( OutputStream outputstream ) throws IOException {
+    for ( int i = 0; i < headers.length; i++ ) {
+      if ( ( headers[i][0] != null ) && ( headers[i][1] != null ) ) {
         outputstream.write( headers[i][0].getBytes() );
         outputstream.write( SEPARATOR );
         outputstream.write( headers[i][1].getBytes() );
@@ -832,8 +743,7 @@ public class HttpMessage
    *
    * @throws IOException
    */
-  public String writeHeaders() throws IOException
-  {
+  public String writeHeaders() throws IOException {
     ByteArrayOutputStream baos = new ByteArrayOutputStream();
     this.writeHeaders( baos );
 
@@ -846,8 +756,7 @@ public class HttpMessage
   /**
    * Method clearHeaders
    */
-  public void clearHeaders()
-  {
+  public void clearHeaders() {
     headers = NO_HEADERS;
   }
 
@@ -861,12 +770,9 @@ public class HttpMessage
    *
    * @return The value of the named MIME header or null if it does not exist.
    */
-  public String getHeader( String data )
-  {
-    for( int i = 0; i < headers.length; i++ )
-    {
-      if( data.equalsIgnoreCase( headers[i][0] ) )
-      {
+  public String getHeader( String data ) {
+    for ( int i = 0; i < headers.length; i++ ) {
+      if ( data.equalsIgnoreCase( headers[i][0] ) ) {
         return headers[i][1];
       }
     }
@@ -884,14 +790,11 @@ public class HttpMessage
    *
    * @return
    */
-  public Enumeration getHeaders( String data )
-  {
+  public Enumeration getHeaders( String data ) {
     Vector vector = new Vector();
 
-    for( int i = 0; i < headers.length; i++ )
-    {
-      if( data.equalsIgnoreCase( headers[i][0] ) )
-      {
+    for ( int i = 0; i < headers.length; i++ ) {
+      if ( data.equalsIgnoreCase( headers[i][0] ) ) {
         vector.addElement( headers[i][1] );
       }
     }
@@ -909,8 +812,7 @@ public class HttpMessage
    *
    * @return
    */
-  public boolean containsHeader( String data )
-  {
+  public boolean containsHeader( String data ) {
     return getHeader( data ) != null;
   }
 
@@ -922,14 +824,11 @@ public class HttpMessage
    *
    * @return
    */
-  public Enumeration getHeaderNames()
-  {
+  public Enumeration getHeaderNames() {
     Vector vector = new Vector();
 
-    for( int i = 0; i < headers.length; i++ )
-    {
-      if( !vector.contains( headers[i][0] ) )
-      {
+    for ( int i = 0; i < headers.length; i++ ) {
+      if ( !vector.contains( headers[i][0] ) ) {
         vector.addElement( headers[i][0] );
       }
     }
@@ -949,12 +848,9 @@ public class HttpMessage
    * @param name the name of the header to set
    * @param value the value to add to the named header
    */
-  public void setHeader( String name, String value )
-  {
-    for( int i = 0; i < headers.length; i++ )
-    {
-      if( name.equalsIgnoreCase( headers[i][0] ) )
-      {
+  public void setHeader( String name, String value ) {
+    for ( int i = 0; i < headers.length; i++ ) {
+      if ( name.equalsIgnoreCase( headers[i][0] ) ) {
         headers[i][0] = name;
         headers[i][1] = value;
 
@@ -979,8 +875,7 @@ public class HttpMessage
    * @param name the name of the header to add
    * @param value the value to add to the named header
    */
-  public void addHeader( String name, String value )
-  {
+  public void addHeader( String name, String value ) {
     String as[][] = new String[headers.length + 1][];
     System.arraycopy( headers, 0, as, 0, headers.length );
 
@@ -998,8 +893,7 @@ public class HttpMessage
    *
    * @return the integer value of the given named header or -1 if not defined.
    */
-  public int getIntHeader( String name )
-  {
+  public int getIntHeader( String name ) {
     String value = getHeader( name );
     return ( value != null ) ? Integer.parseInt( value ) : -1;
   }
@@ -1013,8 +907,7 @@ public class HttpMessage
    * @param name the name of the header to set.
    * @param value the integer value to set to the named header
    */
-  public void setIntHeader( String name, int value )
-  {
+  public void setIntHeader( String name, int value ) {
     setHeader( name, String.valueOf( value ) );
   }
 
@@ -1027,8 +920,7 @@ public class HttpMessage
    * @param data
    * @param i
    */
-  public void addIntHeader( String data, int i )
-  {
+  public void addIntHeader( String data, int i ) {
     addHeader( data, String.valueOf( i ) );
   }
 
@@ -1042,35 +934,27 @@ public class HttpMessage
    *
    * @return
    */
-  public long getDateHeader( String data )
-  {
+  public long getDateHeader( String data ) {
     String s1 = getHeader( data );
 
-    if( s1 == null )
-    {
+    if ( s1 == null ) {
       return -1L;
     }
 
-    try
-    {
+    try {
       long l;
 
-      synchronized( dateFormatter1 )
-      {
+      synchronized( dateFormatter1 ) {
         Date date = dateFormatter1.parse( s1, new ParsePosition( 0 ) );
         l = date.getTime();
       }
 
       return l;
-    }
-    catch( Exception exception )
-    {
-    }
+    } catch ( Exception exception ) {}
 
     long l1;
 
-    synchronized( dateFormatter2 )
-    {
+    synchronized( dateFormatter2 ) {
       Date date1 = dateFormatter2.parse( s1, new ParsePosition( 0 ) );
       l1 = date1.getTime();
     }
@@ -1092,14 +976,10 @@ public class HttpMessage
    *
    * @param cookie the Cookie object to store in the message
    */
-  public void addCookie( Cookie cookie )
-  {
-    if( ( cookie.getName() != null ) && ( cookie.getName().length() > 0 ) )
-    {
+  public void addCookie( Cookie cookie ) {
+    if ( ( cookie.getName() != null ) && ( cookie.getName().length() > 0 ) ) {
       cookieJar.addCookie( cookie );
-    }
-    else
-    {
+    } else {
       throw new IllegalArgumentException( "Can not add un-named cookie" );
     }
   }
@@ -1118,8 +998,7 @@ public class HttpMessage
    *
    * @return The Cookie object representing the named cookie or null if not found.
    */
-  public Cookie getCookie( String name )
-  {
+  public Cookie getCookie( String name ) {
     return cookieJar.getCookie( name );
   }
 
@@ -1136,8 +1015,7 @@ public class HttpMessage
    *
    * @return The array of Cookie objects representing the named cookie. If no cookies are found with the given name the array will be empty.
    */
-  public Cookie[] getCookies( String name )
-  {
+  public Cookie[] getCookies( String name ) {
     return cookieJar.getCookies( name );
   }
 
@@ -1149,8 +1027,7 @@ public class HttpMessage
    *
    * @param credentials the authorization credentials to place in the header
    */
-  public void addBasicAuthorization( Credentials credentials )
-  {
+  public void addBasicAuthorization( Credentials credentials ) {
     String pem = ByteUtil.toBase64( ( credentials.getAccount() + ":" + credentials.getPassword() ).getBytes() );
     addHeader( AUTHORIZATION, "Basic " + pem );
   }
@@ -1163,40 +1040,30 @@ public class HttpMessage
    *
    * @return
    */
-  public Credentials getBasicAuthorization()
-  {
+  public Credentials getBasicAuthorization() {
     Credentials cred = null;
 
-    try
-    {
-      if( getHeader( AUTHORIZATION ) != null )
-      {
+    try {
+      if ( getHeader( AUTHORIZATION ) != null ) {
         String pem = getHeader( AUTHORIZATION );
         java.util.StringTokenizer stringtokenizer = new java.util.StringTokenizer( pem );
         String type = stringtokenizer.nextToken(); // go past "Basic"
 
-        if( type.equalsIgnoreCase( "Basic" ) )
-        {
+        if ( type.equalsIgnoreCase( "Basic" ) ) {
           String field = new String( ByteUtil.fromBase64( stringtokenizer.nextToken() ) );
 
-          if( field != null )
-          {
+          if ( field != null ) {
             int delim = field.indexOf( ':' );
 
-            if( delim > 0 )
-            {
+            if ( delim > 0 ) {
               cred = new Credentials( field.substring( 0, delim ), field.substring( delim + 1 ) );
             }
           }
-        }
-        else
-        {
+        } else {
           Log.warn( "Got an authorization type of '" + type + "'" );
         }
       }
-    }
-    catch( Exception e )
-    {
+    } catch ( Exception e ) {
       e.printStackTrace();
     }
 
@@ -1212,10 +1079,8 @@ public class HttpMessage
    * @param data
    * @param l
    */
-  public void addDateHeader( String data, long l )
-  {
-    synchronized( dateFormatter1 )
-    {
+  public void addDateHeader( String data, long l ) {
+    synchronized( dateFormatter1 ) {
       addHeader( data, dateFormatter1.format( new Date( l ) ) );
     }
   }
@@ -1228,8 +1093,7 @@ public class HttpMessage
    *
    * @return
    */
-  public String getHttpVersion()
-  {
+  public String getHttpVersion() {
     return HttpVersion;
   }
 
@@ -1241,8 +1105,7 @@ public class HttpMessage
    *
    * @param ver
    */
-  public void setHttpVersion( String ver )
-  {
+  public void setHttpVersion( String ver ) {
     HttpVersion = ver;
   }
 
@@ -1255,8 +1118,7 @@ public class HttpMessage
    * @return an integer value of the stated length of the message body, or -1 if
    *         not defined.
    */
-  public int getContentLength()
-  {
+  public int getContentLength() {
     return getIntHeader( CONTENT_LENGTH );
   }
 
@@ -1268,8 +1130,7 @@ public class HttpMessage
    *
    * @param len the integer value of the stated length of the message body
    */
-  public void setContentLength( int len )
-  {
+  public void setContentLength( int len ) {
     setIntHeader( CONTENT_LENGTH, len );
   }
 
@@ -1281,8 +1142,7 @@ public class HttpMessage
    *
    * @return
    */
-  public String getContentType()
-  {
+  public String getContentType() {
     return getHeader( CONTENT_TYPE );
   }
 
@@ -1294,8 +1154,7 @@ public class HttpMessage
    *
    * @param data
    */
-  public void setContentType( String data )
-  {
+  public void setContentType( String data ) {
     setHeader( CONTENT_TYPE, data );
   }
 
@@ -1307,19 +1166,16 @@ public class HttpMessage
    *
    * @return
    */
-  public String getCharacterEncoding()
-  {
+  public String getCharacterEncoding() {
     String data = getContentType();
 
-    if( data == null )
-    {
+    if ( data == null ) {
       return DEFAULT_CHARACTER_ENCODING;
     }
 
     int i = data.indexOf( CHARSET );
 
-    if( i == -1 )
-    {
+    if ( i == -1 ) {
       return DEFAULT_CHARACTER_ENCODING;
     }
 
@@ -1327,16 +1183,13 @@ public class HttpMessage
 
     StringBuffer stringbuffer = new StringBuffer();
 
-    for( ; ( i < data.length() ) && ( data.charAt( i ) != ';' ); stringbuffer.append( data.charAt( i++ ) ) );
+    for ( ; ( i < data.length() ) && ( data.charAt( i ) != ';' ); stringbuffer.append( data.charAt( i++ ) ) );
 
     String temp = stringbuffer.toString();
 
-    if( temp.startsWith( "\"" ) )
-    {
+    if ( temp.startsWith( "\"" ) ) {
       return temp.substring( 1, temp.length() - 1 );
-    }
-    else
-    {
+    } else {
       return temp;
     }
   }
@@ -1349,18 +1202,13 @@ public class HttpMessage
    *
    * @return
    */
-  public boolean isKeepAlive()
-  {
+  public boolean isKeepAlive() {
     String status = getHeader( CONNECTION );
 
-    if( status != null )
-    {
-      if( getHttpVersion().equals( HTTP_1_0 ) )
-      {
+    if ( status != null ) {
+      if ( getHttpVersion().equals( HTTP_1_0 ) ) {
         return status.equalsIgnoreCase( KEEP_ALIVE );
-      }
-      else
-      {
+      } else {
         return !status.equalsIgnoreCase( CLOSE );
       }
     }
@@ -1376,8 +1224,7 @@ public class HttpMessage
    *
    * @return
    */
-  public Enumeration getLocales()
-  {
+  public Enumeration getLocales() {
     return null;
   }
 
@@ -1389,8 +1236,7 @@ public class HttpMessage
    *
    * @param locale
    */
-  public void setLocale( Locale locale )
-  {
+  public void setLocale( Locale locale ) {
     setHeader( ACCEPT_LANGUAGE, locale.toString() );
   }
 
@@ -1402,8 +1248,7 @@ public class HttpMessage
    *
    * @return
    */
-  public Locale getLocale()
-  {
+  public Locale getLocale() {
     return (Locale)getLocales().nextElement();
   }
 
@@ -1413,8 +1258,7 @@ public class HttpMessage
   /**
    * Method reset
    */
-  public void reset()
-  {
+  public void reset() {
     clearHeaders();
   }
 
@@ -1426,8 +1270,7 @@ public class HttpMessage
    *
    * @return
    */
-  public OutputStream getOutput()
-  {
+  public OutputStream getOutput() {
     return output;
   }
 
@@ -1439,8 +1282,7 @@ public class HttpMessage
    *
    * @return
    */
-  public int getTimeout()
-  {
+  public int getTimeout() {
     return timeout;
   }
 
@@ -1452,8 +1294,7 @@ public class HttpMessage
    *
    * @param timeout
    */
-  public void setTimeout( int timeout )
-  {
+  public void setTimeout( int timeout ) {
     this.timeout = timeout;
   }
 
@@ -1472,14 +1313,10 @@ public class HttpMessage
    *
    * @return a byte[] containing the body of the message as it was received or a byte[] of zero size if there is no body.
    */
-  public byte[] getBody()
-  {
-    if( output != null )
-    {
+  public byte[] getBody() {
+    if ( output != null ) {
       return output.toByteArray();
-    }
-    else
-    {
+    } else {
       return new byte[0];
     }
   }
@@ -1497,23 +1334,16 @@ public class HttpMessage
    *
    * @throws HttpMessageException
    */
-  public void setBody( byte[] data ) throws HttpMessageException
-  {
-    if( data != null )
-    {
+  public void setBody( byte[] data ) throws HttpMessageException {
+    if ( data != null ) {
       output = new ByteArrayOutputStream( data.length );
 
-      try
-      {
+      try {
         output.write( data );
-      }
-      catch( IOException ioe )
-      {
+      } catch ( IOException ioe ) {
         throw new HttpMessageException( ioe );
       }
-    }
-    else
-    {
+    } else {
       output = new ByteArrayOutputStream();
     }
   }
@@ -1528,8 +1358,7 @@ public class HttpMessage
    *
    * @return
    */
-  public static String decodeHtmlString( String data )
-  {
+  public static String decodeHtmlString( String data ) {
     return UriUtil.decodeString( data );
   }
 
@@ -1543,8 +1372,7 @@ public class HttpMessage
    *
    * @return
    */
-  public static String encodeHtmlString( String data )
-  {
+  public static String encodeHtmlString( String data ) {
     return UriUtil.encodeString( data );
   }
 
@@ -1556,8 +1384,7 @@ public class HttpMessage
    *
    * @return
    */
-  public InetAddress getRemoteAddress()
-  {
+  public InetAddress getRemoteAddress() {
     return remoteAddress;
   }
 
@@ -1569,8 +1396,7 @@ public class HttpMessage
    *
    * @param addr
    */
-  public void setRemoteAddress( InetAddress addr )
-  {
+  public void setRemoteAddress( InetAddress addr ) {
     this.remoteAddress = addr;
   }
 
@@ -1582,8 +1408,7 @@ public class HttpMessage
    *
    * @return
    */
-  public int getRemotePort()
-  {
+  public int getRemotePort() {
     return remotePort;
   }
 
@@ -1595,8 +1420,7 @@ public class HttpMessage
    *
    * @param port
    */
-  public void setRemotePort( int port )
-  {
+  public void setRemotePort( int port ) {
     this.remotePort = port;
   }
 

@@ -1,7 +1,13 @@
 /*
- * $Id: MD5.java,v 1.2 2004/01/02 15:10:28 cotes Exp $
+ * Copyright (c) 2003 Stephan D. Cote' - All rights reserved.
+ * 
+ * This program and the accompanying materials are made available under the 
+ * terms of the MIT License which accompanies this distribution, and is 
+ * available at http://creativecommons.org/licenses/MIT/
  *
- * Copyright (C) 2003 Stephan D. Cote' - All rights reserved.
+ * Contributors:
+ *   Stephan D. Cote 
+ *      - Initial implementation
  */
 package coyote.commons.security;
 
@@ -37,11 +43,8 @@ package coyote.commons.security;
  * <BR>
  * byte md5bytes[] = md.digest();
  * </PRE></p>
- *
- * @version $Revision: 1.3 $
  */
-public class MD5 implements Digest
-{
+public class MD5 implements Digest {
   // context class for this MD5 operation.
   private MD5_CTX context;
 
@@ -69,8 +72,7 @@ public class MD5 implements Digest
   /**
    * MD5 initialization. Begins an MD5 operation, writing a new context.
    */
-  public MD5()
-  {
+  public MD5() {
     context = new MD5_CTX();
   }
 
@@ -80,8 +82,7 @@ public class MD5 implements Digest
   /**
    * Method reset
    */
-  public void reset()
-  {
+  public void reset() {
     context.reset();
   }
 
@@ -96,8 +97,7 @@ public class MD5 implements Digest
    *
    * @param input byte array of data
    */
-  public void update( byte input[] )
-  {
+  public void update( byte input[] ) {
     update( input, 0, input.length );
   }
 
@@ -111,8 +111,7 @@ public class MD5 implements Digest
    * @param offset offset into the array to start the digest calculation
    * @param inputLen byte count to use in the calculation
    */
-  public void update( byte input[], int offset, int inputLen )
-  {
+  public void update( byte input[], int offset, int inputLen ) {
     int i, index, partLen;
     // Compute number of bytes mod 64
     index = ( context.count[0] >>> 3 ) & 0x3F;
@@ -120,8 +119,7 @@ public class MD5 implements Digest
     // Update number of bits
     int slen = inputLen << 3;
 
-    if( ( context.count[0] += slen ) < slen )
-    {
+    if ( ( context.count[0] += slen ) < slen ) {
       context.count[1]++;
     }
 
@@ -129,20 +127,16 @@ public class MD5 implements Digest
     partLen = 64 - index;
 
     // Transform as many times as possible.
-    if( inputLen >= partLen )
-    {
+    if ( inputLen >= partLen ) {
       context.copy( index, input, offset, partLen );
       MD5Transform( context.buffer, 0, 0 );
 
-      for( i = partLen; i + 63 < inputLen; i += 64 )
-      {
+      for ( i = partLen; i + 63 < inputLen; i += 64 ) {
         MD5Transform( input, offset, i );
       }
 
       index = 0;
-    }
-    else
-    {
+    } else {
       i = 0;
     }
 
@@ -163,8 +157,7 @@ public class MD5 implements Digest
    *
    * @return the digest
    */
-  public byte[] digest()
-  {
+  public byte[] digest() {
     byte bits[];
     byte finalDigest[];
     int index, padLen;
@@ -177,13 +170,11 @@ public class MD5 implements Digest
     padLen = ( index < 56 ) ? ( 56 - index ) : ( 120 - index );
 
     // build padding buffer.
-    if( padLen > 0 )
-    {
+    if ( padLen > 0 ) {
       byte PADDING[] = new byte[padLen];
       PADDING[0] = (byte)0x80;
 
-      for( int i = 1; i < padLen; i++ )
-      {
+      for ( int i = 1; i < padLen; i++ ) {
         PADDING[i] = 0;
       }
 
@@ -214,8 +205,7 @@ public class MD5 implements Digest
    *
    * @return
    */
-  private int F( int x, int y, int z )
-  {
+  private int F( int x, int y, int z ) {
     return ( ( ( x ) & ( y ) ) | ( ( ~x ) & ( z ) ) );
   }
 
@@ -231,8 +221,7 @@ public class MD5 implements Digest
    *
    * @return
    */
-  private int G( int x, int y, int z )
-  {
+  private int G( int x, int y, int z ) {
     return ( ( ( x ) & ( z ) ) | ( ( y ) & ( ~z ) ) );
   }
 
@@ -248,8 +237,7 @@ public class MD5 implements Digest
    *
    * @return
    */
-  private int H( int x, int y, int z )
-  {
+  private int H( int x, int y, int z ) {
     return ( ( x ) ^ ( y ) ^ ( z ) );
   }
 
@@ -265,8 +253,7 @@ public class MD5 implements Digest
    *
    * @return
    */
-  private int I( int x, int y, int z )
-  {
+  private int I( int x, int y, int z ) {
     return ( ( y ) ^ ( ( x ) | ( ~z ) ) );
   }
 
@@ -281,8 +268,7 @@ public class MD5 implements Digest
    *
    * @return
    */
-  private int ROTATE_LEFT( int x, int n )
-  {
+  private int ROTATE_LEFT( int x, int n ) {
     return ( ( ( x ) << ( n ) ) | ( ( x ) >>> ( 32 - ( n ) ) ) );
   }
 
@@ -304,8 +290,7 @@ public class MD5 implements Digest
    *
    * @return
    */
-  private int FF( int a, int b, int c, int d, int x, int s, int ac )
-  {
+  private int FF( int a, int b, int c, int d, int x, int s, int ac ) {
     a += F( ( b ), ( c ), ( d ) ) + ( x ) + ( ac );
     a = ROTATE_LEFT( a, ( s ) );
     a += ( b );
@@ -329,8 +314,7 @@ public class MD5 implements Digest
    *
    * @return
    */
-  private int GG( int a, int b, int c, int d, int x, int s, int ac )
-  {
+  private int GG( int a, int b, int c, int d, int x, int s, int ac ) {
     a += G( ( b ), ( c ), ( d ) ) + ( x ) + ( ac );
     a = ROTATE_LEFT( a, ( s ) );
     a += ( b );
@@ -354,8 +338,7 @@ public class MD5 implements Digest
    *
    * @return
    */
-  private int HH( int a, int b, int c, int d, int x, int s, int ac )
-  {
+  private int HH( int a, int b, int c, int d, int x, int s, int ac ) {
     a += H( ( b ), ( c ), ( d ) ) + ( x ) + ( ac );
     a = ROTATE_LEFT( a, ( s ) );
     a += ( b );
@@ -379,8 +362,7 @@ public class MD5 implements Digest
    *
    * @return
    */
-  private int II( int a, int b, int c, int d, int x, int s, int ac )
-  {
+  private int II( int a, int b, int c, int d, int x, int s, int ac ) {
     a += I( ( b ), ( c ), ( d ) ) + ( x ) + ( ac );
     a = ROTATE_LEFT( a, ( s ) );
     a += ( b );
@@ -400,8 +382,7 @@ public class MD5 implements Digest
    * @param offset
    * @param posn
    */
-  private void MD5Transform( byte block[], int offset, int posn )
-  {
+  private void MD5Transform( byte block[], int offset, int posn ) {
     int a = context.state[0], b = context.state[1];
     int c = context.state[2], d = context.state[3];
     int x[];
@@ -481,8 +462,7 @@ public class MD5 implements Digest
 
     // Zeroize sensitive information.
     // MD5_memset ((POINTER)x, 0, sizeof (x));
-    for( int i = 0; i < x.length; i++ )
-    {
+    for ( int i = 0; i < x.length; i++ ) {
       x[i] = 0;
     }
 
@@ -502,13 +482,11 @@ public class MD5 implements Digest
    *
    * @return
    */
-  private byte[] Encode( int input[], int len )
-  {
+  private byte[] Encode( int input[], int len ) {
     int i, j;
     byte output[] = new byte[len];
 
-    for( i = 0, j = 0; j < len; i++, j += 4 )
-    {
+    for ( i = 0, j = 0; j < len; i++, j += 4 ) {
       output[j] = (byte)( input[i] & 0xff );
       output[j + 1] = (byte)( ( input[i] >>> 8 ) & 0xff );
       output[j + 2] = (byte)( ( input[i] >>> 16 ) & 0xff );
@@ -533,14 +511,12 @@ public class MD5 implements Digest
    *
    * @return
    */
-  int[] Decode( byte input[], int offset, int posn, int len )
-  {
+  int[] Decode( byte input[], int offset, int posn, int len ) {
     int output[] = new int[len / 4];
     int i, j;
     int limit = len + posn + offset;
 
-    for( i = 0, j = offset + posn; j < limit; i++, j += 4 )
-    {
+    for ( i = 0, j = offset + posn; j < limit; i++, j += 4 ) {
       output[i] = ( ( (int)input[j] ) & 0xff ) | ( ( ( (int)input[j + 1] ) & 0xff ) << 8 ) | ( ( ( (int)input[j + 2] ) & 0xff ) << 16 ) | ( ( ( (int)input[j + 3] ) & 0xff ) << 24 );
     }
 
@@ -555,8 +531,7 @@ public class MD5 implements Digest
 /**
  * MD5 context.
  */
-class MD5_CTX
-{
+class MD5_CTX {
 
   /** state (ABCD) */
   int state[];
@@ -573,8 +548,7 @@ class MD5_CTX
   /**
    * Constructor MD5_CTX
    */
-  MD5_CTX()
-  {
+  MD5_CTX() {
     reset();
   }
 
@@ -584,8 +558,7 @@ class MD5_CTX
   /**
    * Method reset
    */
-  void reset()
-  {
+  void reset() {
     buffer = new byte[64];
     state = new int[4];
     count = new int[2];
@@ -603,8 +576,7 @@ class MD5_CTX
   /**
    * Clear sensitive information.
    */
-  void clear()
-  {
+  void clear() {
     state[0] = 0;
     state[1] = 0;
     state[2] = 0;
@@ -612,8 +584,7 @@ class MD5_CTX
     count[0] = 0;
     count[1] = 0;
 
-    for( int i = 0; i < 64; i++ )
-    {
+    for ( int i = 0; i < 64; i++ ) {
       buffer[i] = 0;
     }
   }
@@ -629,12 +600,10 @@ class MD5_CTX
    * @param offset
    * @param len
    */
-  void copy( int bufoffset, byte input[], int offset, int len )
-  {
+  void copy( int bufoffset, byte input[], int offset, int len ) {
     // arraycopy has no idea that it shouldn't copy some things.
     // Protect the poor dear.
-    if( offset == input.length )
-    {
+    if ( offset == input.length ) {
       return;
     }
 

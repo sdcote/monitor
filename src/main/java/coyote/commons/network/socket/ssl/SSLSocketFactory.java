@@ -1,7 +1,13 @@
 /*
- * $Id: SSLSocketFactory.java,v 1.2 2005/03/01 20:44:08 cotes Exp $
+ * Copyright (c) 2003 Stephan D. Cote' - All rights reserved.
+ * 
+ * This program and the accompanying materials are made available under the 
+ * terms of the MIT License which accompanies this distribution, and is 
+ * available at http://creativecommons.org/licenses/MIT/
  *
- * Copyright (C) 2003 Stephan D. Cote' - All rights reserved.
+ * Contributors:
+ *   Stephan D. Cote 
+ *      - Initial concept and initial implementation
  */
 package coyote.commons.network.socket.ssl;
 
@@ -34,25 +40,18 @@ import coyote.commons.network.socket.ISocketFactory;
  */
 public class SSLSocketFactory implements ISocketFactory {
 
-  /** Field DEFAULT_PASSWORD */
   static final String DEFAULT_PASSWORD = "bralyn";
 
-  /** Field regularRandom */
   static final Random regularRandom = new Random();
 
-  /** Field home */
   String home;
 
-  /** Field trustStore */
   String trustStore;
 
-  /** Field trustStorePassword */
   String trustStorePassword;
 
-  /** Field socketFactory */
   javax.net.ssl.SSLSocketFactory socketFactory;
 
-  /** Field serverSocketFactory */
   SSLServerSocketFactory serverSocketFactory;
 
 

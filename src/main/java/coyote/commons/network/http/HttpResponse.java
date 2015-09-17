@@ -1,7 +1,13 @@
 /*
- * $Id: HttpResponse.java,v 1.5 2004/04/21 16:39:35 cotes Exp $
+ * Copyright (c) 2003 Stephan D. Cote' - All rights reserved.
+ * 
+ * This program and the accompanying materials are made available under the 
+ * terms of the MIT License which accompanies this distribution, and is 
+ * available at http://creativecommons.org/licenses/MIT/
  *
- * Copyright (C) 2003 Stephan D. Cote' - All rights reserved.
+ * Contributors:
+ *   Stephan D. Cote 
+ *      - Initial concept and initial implementation
  */
 package coyote.commons.network.http;
 
@@ -26,8 +32,7 @@ import coyote.loader.log.Log;
  * @author Stephan D. Cote' - Enterprise Architecture
  * @version $Revision: 1.5 $
  */
-public class HttpResponse extends HttpMessage
-{
+public class HttpResponse extends HttpMessage {
   private Date date = new Date();
   private int statusCode = 200;
   private String reasonPhrase = null;
@@ -50,8 +55,7 @@ public class HttpResponse extends HttpMessage
   /**
    * Constructor HttpResponse
    */
-  public HttpResponse()
-  {
+  public HttpResponse() {
     this.requestSent = System.currentTimeMillis();
 
     setTimeout( DEFAULT_TIMEOUT );
@@ -71,8 +75,7 @@ public class HttpResponse extends HttpMessage
    *
    * @throws HttpMessageException
    */
-  public HttpResponse( InputStream in ) throws HttpMessageException
-  {
+  public HttpResponse( InputStream in ) throws HttpMessageException {
     this();
 
     this.input = in;
@@ -86,8 +89,7 @@ public class HttpResponse extends HttpMessage
   /**
    * Method reset
    */
-  public void reset()
-  {
+  public void reset() {
     super.reset();
     super.setContentType( DEFAULT_CONTENT_TYPE );
     setTimeout( DEFAULT_TIMEOUT );
@@ -112,13 +114,11 @@ public class HttpResponse extends HttpMessage
    *
    * @throws HttpMessageException
    */
-  public void parse( InputStream in ) throws HttpMessageException
-  {
+  public void parse( InputStream in ) throws HttpMessageException {
     // clear out everything
     reset();
 
-    if( in != null )
-    {
+    if ( in != null ) {
       // Start our time-out timer
       startTimer();
 
@@ -126,20 +126,15 @@ public class HttpResponse extends HttpMessage
       started = System.currentTimeMillis();
 
       // Keep looping
-      while( true )
-      {
-        try
-        {
+      while ( true ) {
+        try {
           // Make sure we have data in the stream
-          if( in.available() > 0 )
-          {
-            if( responseReceived == 0 )
-            {
+          if ( in.available() > 0 ) {
+            if ( responseReceived == 0 ) {
               responseReceived = System.currentTimeMillis();
             }
 
-            try
-            {
+            try {
               // The first line should always be the Status-Line (section: 6.1)
               String status = StreamUtil.readLine( in );
 
@@ -148,29 +143,25 @@ public class HttpResponse extends HttpMessage
 
               Log.append( HTTP, getClass().getName() + "parse() StatusLine=" + status + "'" );
 
-              if( ( status != null ) && ( status.length() > 0 ) )
-              {
+              if ( ( status != null ) && ( status.length() > 0 ) ) {
                 // RFC2616 section 6.1
                 int mark = 0;
                 int state = 0;
 
-                for( int i = 0; i < status.length(); i++ )
-                {
+                for ( int i = 0; i < status.length(); i++ ) {
                   char c = status.charAt( i );
 
-                  if( ( c == ' ' ) )
-                  {
-                    switch( state )
-                    {
+                  if ( ( c == ' ' ) ) {
+                    switch ( state ) {
 
-                      case 0:  // Looking for HTTP-Version (6.1)
+                      case 0: // Looking for HTTP-Version (6.1)
                         setHttpVersion( status.substring( mark, i ) );
 
                         mark = i + 1;
                         state = 1;
                         break;
 
-                      case 1:  // Looking for Status-Code (6.1.1)
+                      case 1: // Looking for Status-Code (6.1.1)
                         setStatusCode( Integer.parseInt( status.substring( mark, i ) ) );
 
                         mark = i + 1;
@@ -180,19 +171,13 @@ public class HttpResponse extends HttpMessage
                   }
 
                   // Check to see if we are at the end of the Status-Line
-                  if( ( i + 1 ) >= status.length() )
-                  {
+                  if ( ( i + 1 ) >= status.length() ) {
                     // Finish up the parsing of the last character
-                    if( state == 0 )
-                    {
+                    if ( state == 0 ) {
                       throw new HttpMessageException( "No Status-Code found" );
-                    }
-                    else if( state == 1 )
-                    {
+                    } else if ( state == 1 ) {
                       setStatusCode( Integer.parseInt( status.substring( mark ) ) );
-                    }
-                    else
-                    {
+                    } else {
                       // Do we really care about this if we have the Status-Code?
                       setReasonPhrase( status.substring( mark ) );
                     }
@@ -207,30 +192,22 @@ public class HttpResponse extends HttpMessage
                 this.byteCount += readHeaders( in );
 
                 // If there is more data on the line...
-                if( in.available() > 0 )
-                {
+                if ( in.available() > 0 ) {
                   // read in the data, assigning it to the body of the message,
                   // and tally the bytes received in the process.
                   this.byteCount += readBody( in );
-                }
-                else
-                {
-                  if( getContentLength() == 0 )
-                  {
+                } else {
+                  if ( getContentLength() == 0 ) {
                     break;
-                  }
-                  else
-                  {
+                  } else {
                     // Is there a body or not?
 
                     // Wait around for only 20 seconds
                     long abortTime = System.currentTimeMillis() + 20000;
 
                     // Keep checking...
-                    while( abortTime > System.currentTimeMillis() )
-                    {
-                      if( in.available() > 0 )
-                      {
+                    while ( abortTime > System.currentTimeMillis() ) {
+                      if ( in.available() > 0 ) {
                         this.byteCount += readBody( in );
                         abortTime = 0;
                       }
@@ -239,9 +216,7 @@ public class HttpResponse extends HttpMessage
                 }
 
                 break;
-              }
-              else
-              {
+              } else {
                 // This is a valid exception according to the protocol:
                 // 6.1 Status-Line
                 // The first line of a Response message is the Status-Line,
@@ -252,22 +227,17 @@ public class HttpResponse extends HttpMessage
                 throw new HttpMessageException( "No status line" );
               }
 
-            }
-            catch( Exception ex )
-            {
+            } catch ( Exception ex ) {
               System.err.println( "Bogus!-->" + ex.getMessage() + "\n" + ExceptionUtil.stackTrace( ex ) );
 
               throw new HttpMessageException( ex );
             }
           }
-        }
-        catch( IOException ioe )
-        {
+        } catch ( IOException ioe ) {
           throw new HttpMessageException( ioe );
         }
 
-        if( isTimedOut() )
-        {
+        if ( isTimedOut() ) {
           this.setStatusCode( 408 );
 
           break;
@@ -276,9 +246,7 @@ public class HttpResponse extends HttpMessage
 
       // record when response parsing ended
       ended = System.currentTimeMillis();
-    }
-    else
-    {
+    } else {
       throw new HttpMessageException( "Inputstream was null" );
     }
   }
@@ -291,8 +259,7 @@ public class HttpResponse extends HttpMessage
    *
    * @return
    */
-  public String getHttpHeader()
-  {
+  public String getHttpHeader() {
     StringBuffer retval = new StringBuffer();
 
     retval.append( getHttpVersion() );
@@ -302,31 +269,23 @@ public class HttpResponse extends HttpMessage
     retval.append( getReasonPhrase( getStatusCode() ) );
     retval.append( StringUtil.CRLF );
 
-    if( date != null )
-    {
+    if ( date != null ) {
       setHeader( HttpMessage.DATE, DateUtil.RFC822Format( date ) );
     }
 
-    if( server != null )
-    {
+    if ( server != null ) {
       setHeader( HttpMessage.SERVER, server );
     }
 
-    if( getBody() != null )
-    {
+    if ( getBody() != null ) {
       setContentLength( getBody().length );
-    }
-    else
-    {
+    } else {
       setContentLength( 0 );
     }
 
-    try
-    {
+    try {
       retval.append( writeHeaders() );
-    }
-    catch( Exception ioe )
-    {
+    } catch ( Exception ioe ) {
       // "Should" not happen since we use ByteArrayOutputStream
     }
 
@@ -341,19 +300,16 @@ public class HttpResponse extends HttpMessage
    *
    * @return
    */
-  public byte[] getBytes()
-  {
+  public byte[] getBytes() {
     ByteArrayOutputStream os = new ByteArrayOutputStream();
 
-    try
-    {
+    try {
       getWriter().flush();
 
       // OK, sometimes goofy coders place a body in a response AND set the body
       // of a response. If that happens, make sure the body they set is
       // appended to the output generated by the writer
-      if( getBody().length > 0 )
-      {
+      if ( getBody().length > 0 ) {
         baos.write( getBody() );
       }
 
@@ -364,20 +320,10 @@ public class HttpResponse extends HttpMessage
       os.write( getHttpHeader().getBytes( DEFAULT_CHARACTER_ENCODING ) );
       os.write( StringUtil.CRLF.getBytes( DEFAULT_CHARACTER_ENCODING ) );
 
-      if( getBody() != null )
-      {
+      if ( getBody() != null ) {
         os.write( getBody() );
       }
-    }
-    catch( UnsupportedEncodingException uee )
-    {
-    }
-    catch( IOException ioe )
-    {
-    }
-    catch( HttpMessageException ioe )
-    {
-    }
+    } catch ( UnsupportedEncodingException uee ) {} catch ( IOException ioe ) {} catch ( HttpMessageException ioe ) {}
 
     return os.toByteArray();
   }
@@ -390,22 +336,17 @@ public class HttpResponse extends HttpMessage
    *
    * @return
    */
-  public String toString()
-  {
+  public String toString() {
     StringBuffer retval = new StringBuffer();
 
     retval.append( getHttpHeader() );
 
     retval.append( StringUtil.CRLF );
 
-    if( getBody() != null )
-    {
-      try
-      {
+    if ( getBody() != null ) {
+      try {
         retval.append( new String( getBody(), DEFAULT_CHARACTER_ENCODING ) );
-      }
-      catch( Exception ex )
-      {
+      } catch ( Exception ex ) {
         retval.append( new String( getBody() ) );
       }
 
@@ -422,8 +363,7 @@ public class HttpResponse extends HttpMessage
    *
    * @return
    */
-  public Date getDate()
-  {
+  public Date getDate() {
     return date;
   }
 
@@ -435,8 +375,7 @@ public class HttpResponse extends HttpMessage
    *
    * @param date
    */
-  public void setDate( Date date )
-  {
+  public void setDate( Date date ) {
     this.date = date;
   }
 
@@ -448,8 +387,7 @@ public class HttpResponse extends HttpMessage
    *
    * @return
    */
-  public int getStatusCode()
-  {
+  public int getStatusCode() {
     return statusCode;
   }
 
@@ -461,8 +399,7 @@ public class HttpResponse extends HttpMessage
    *
    * @param statusCode
    */
-  public void setStatusCode( int statusCode )
-  {
+  public void setStatusCode( int statusCode ) {
     this.statusCode = statusCode;
   }
 
@@ -474,8 +411,7 @@ public class HttpResponse extends HttpMessage
    *
    * @return
    */
-  public String getServer()
-  {
+  public String getServer() {
     return server;
   }
 
@@ -487,8 +423,7 @@ public class HttpResponse extends HttpMessage
    *
    * @param server
    */
-  public void setServer( String server )
-  {
+  public void setServer( String server ) {
     this.server = server;
   }
 
@@ -500,8 +435,7 @@ public class HttpResponse extends HttpMessage
    *
    * @return
    */
-  public String getReasonPhrase()
-  {
+  public String getReasonPhrase() {
     return reasonPhrase;
   }
 
@@ -513,8 +447,7 @@ public class HttpResponse extends HttpMessage
    *
    * @param reasonPhrase
    */
-  public void setReasonPhrase( String reasonPhrase )
-  {
+  public void setReasonPhrase( String reasonPhrase ) {
     this.reasonPhrase = reasonPhrase;
   }
 
@@ -537,29 +470,22 @@ public class HttpResponse extends HttpMessage
    *
    * @return The number of bytes received per second including server latency.
    */
-  public float getBytesPerSecond()
-  {
-    if( started > 0 )
-    {
+  public float getBytesPerSecond() {
+    if ( started > 0 ) {
       long elapsed = 0;
 
-      if( ended > 0 )
-      {
+      if ( ended > 0 ) {
         elapsed = ended - started;
-      }
-      else
-      {
+      } else {
         elapsed = System.currentTimeMillis() - started;
       }
 
-      if( elapsed == 0 )
-      {
+      if ( elapsed == 0 ) {
         // System.err.println("System clock granularity issues for '"+System.getProperty( "os.name" )+"'");
         elapsed = 10;
       }
 
-      if( elapsed > 0 )
-      {
+      if ( elapsed > 0 ) {
         return ( (float)byteCount / (float)elapsed ) * 1000f;
       }
 
@@ -577,8 +503,7 @@ public class HttpResponse extends HttpMessage
    *
    * @return
    */
-  public long getRequestSent()
-  {
+  public long getRequestSent() {
     return requestSent;
   }
 
@@ -590,8 +515,7 @@ public class HttpResponse extends HttpMessage
    *
    * @param requestSent
    */
-  public void setRequestSent( long requestSent )
-  {
+  public void setRequestSent( long requestSent ) {
     this.requestSent = requestSent;
   }
 
@@ -603,8 +527,7 @@ public class HttpResponse extends HttpMessage
    *
    * @return
    */
-  public long getResponseReceived()
-  {
+  public long getResponseReceived() {
     return responseReceived;
   }
 
@@ -616,8 +539,7 @@ public class HttpResponse extends HttpMessage
    *
    * @param responseReceived
    */
-  public void setResponseReceived( long responseReceived )
-  {
+  public void setResponseReceived( long responseReceived ) {
     this.responseReceived = responseReceived;
   }
 
@@ -629,10 +551,8 @@ public class HttpResponse extends HttpMessage
    *
    * @return
    */
-  public long getServerLatency()
-  {
-    if( ( requestSent > 0 ) && ( responseReceived > 0 ) )
-    {
+  public long getServerLatency() {
+    if ( ( requestSent > 0 ) && ( responseReceived > 0 ) ) {
       return responseReceived - requestSent;
     }
 
@@ -647,8 +567,7 @@ public class HttpResponse extends HttpMessage
    *
    * @return
    */
-  public long getConnectionTime()
-  {
+  public long getConnectionTime() {
     return connectionTime;
   }
 
@@ -660,8 +579,7 @@ public class HttpResponse extends HttpMessage
    *
    * @param connectionTime
    */
-  public void setConnectionTime( long connectionTime )
-  {
+  public void setConnectionTime( long connectionTime ) {
     this.connectionTime = connectionTime;
   }
 
@@ -673,8 +591,7 @@ public class HttpResponse extends HttpMessage
    *
    * @param realm
    */
-  public void requestBasicAuthentication( String realm )
-  {
+  public void requestBasicAuthentication( String realm ) {
     setStatusCode( 401 );
     addHeader( WWW_AUTHENTICATE, "Basic realm=\"" + realm + "\"" );
     setContentLength( 0 );
@@ -689,14 +606,10 @@ public class HttpResponse extends HttpMessage
    *
    * @param cookie
    */
-  public void addCookie( Cookie cookie )
-  {
-    if( cookie.getVersion() == 0 )
-    {
+  public void addCookie( Cookie cookie ) {
+    if ( cookie.getVersion() == 0 ) {
       addHeader( "Set-Cookie", Cookie.toString( cookie ) );
-    }
-    else
-    {
+    } else {
       addHeader( "Set-Cookie2", Cookie.toString( cookie ) );
     }
   }
@@ -709,8 +622,7 @@ public class HttpResponse extends HttpMessage
    *
    * @return
    */
-  public PrintWriter getWriter()
-  {
+  public PrintWriter getWriter() {
     return writer;
   }
 
@@ -722,29 +634,20 @@ public class HttpResponse extends HttpMessage
    *
    * @return
    */
-  public OutputStream getOutputStream()
-  {
-    if( outputStream != null )
-    {
+  public OutputStream getOutputStream() {
+    if ( outputStream != null ) {
       this.outputUserControlled = true;
 
       // Write all the headers we have so far to the peer as the output stream
       // will contain the body and we cannot send the body without the headers
       ByteArrayOutputStream os = new ByteArrayOutputStream();
 
-      try
-      {
+      try {
         os.write( getHttpHeader().getBytes( DEFAULT_CHARACTER_ENCODING ) );
         os.write( StringUtil.CRLF.getBytes( DEFAULT_CHARACTER_ENCODING ) );
         outputStream.write( baos.toByteArray() );
         outputStream.flush();
-      }
-      catch( UnsupportedEncodingException uee )
-      {
-      }
-      catch( IOException ioe )
-      {
-      }
+      } catch ( UnsupportedEncodingException uee ) {} catch ( IOException ioe ) {}
     }
 
     return this.outputStream;
@@ -758,8 +661,7 @@ public class HttpResponse extends HttpMessage
    *
    * @param out
    */
-  public void setOutputStream( OutputStream out )
-  {
+  public void setOutputStream( OutputStream out ) {
     this.outputStream = out;
   }
 
@@ -771,8 +673,7 @@ public class HttpResponse extends HttpMessage
    *
    * @return
    */
-  public boolean isOutputUserControlled()
-  {
+  public boolean isOutputUserControlled() {
     return outputUserControlled;
   }
 

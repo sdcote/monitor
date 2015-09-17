@@ -1,5 +1,13 @@
 /*
- * $Id: SocketServer.java,v 1.3 2005/03/01 20:44:04 cotes Exp $
+ * Copyright (c) 2003 Stephan D. Cote' - All rights reserved.
+ * 
+ * This program and the accompanying materials are made available under the 
+ * terms of the MIT License which accompanies this distribution, and is 
+ * available at http://creativecommons.org/licenses/MIT/
+ *
+ * Contributors:
+ *   Stephan D. Cote 
+ *      - Initial concept and initial implementation
  */
 package coyote.commons.network.socket;
 
@@ -33,37 +41,26 @@ import coyote.loader.thread.ThreadPool;
  */
 public final class SocketServer implements Runnable {
 
-  /** Field DEFAULT_MAX_INBOUND_KEEP_ALIVE */
   public static final int DEFAULT_MAX_INBOUND_KEEP_ALIVE = 5;
 
-  /** Field DEFAULT_BACKLOG */
   public static final int DEFAULT_BACKLOG = 50;
 
-  /** Field defaultBacklog */
   static int defaultBacklog = 50;
 
-  /** Field backlog */
   int backlog;
 
-  /** Field sink */
   IChannelSink sink;
 
-  /** Field stop */
   volatile boolean stop;
 
-  /** Field offline */
   volatile boolean offline;
 
-  /** Field uri */
   URI uri;
 
-  /** Field serverSocket */
   ServerSocket serverSocket;
 
-  /** Field threadPool */
   ThreadPool threadPool;
 
-  /** Field padlock */
   Object padlock = new Object();
 
   /** Our Access Control List of IpAddresses */
