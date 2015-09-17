@@ -48,6 +48,10 @@ public abstract class AbstractProbe extends AbstractCollector implements Probe, 
 
     // Probes need to run intermittently and need to be repeatedly rescheduled
     setRepeatable( true );
+    
+    // Set the next (first) time we are to run
+    executionTime = System.currentTimeMillis() + 1000;
+
   }
 
 
@@ -101,13 +105,6 @@ public abstract class AbstractProbe extends AbstractCollector implements Probe, 
   @Override
   public void initialize() {
     super.initialize();
-
-    // Set the next (first) time we are to run
-    executionTime = System.currentTimeMillis() + 1000;
-
-    // Setup number of millis between calls to our doWork() method
-    executionInterval = metricInterval;
-    Log.info( "Execution interval is set to " + executionInterval + "ms" );
 
   }
 

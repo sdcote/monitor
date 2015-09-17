@@ -30,6 +30,8 @@ import coyote.monitor.Sample;
  * TODO support POST, HEAD, PUT, DELETE and TRACE
  * TODO support Basic Authentication
  * TODO place header data in the sample and metric
+ * TODO Proxy-aware
+ * TODO NTLM proxy support
  *
  * @author Stephan D. Cote' - Enterprise Architecture
  * @version $Revision: 1.7 $

@@ -30,9 +30,6 @@ import coyote.loader.thread.ScheduledJob;
  */
 public abstract class AbstractCollector extends ScheduledJob implements Collector, ManagedComponent {
 
-  /** How often do we generate metric data? */
-  protected long metricInterval = DEFAULT_SAMPLE_INTERVAL;
-
   /** How often do we try to generate metric data when we are in an error state? */
   protected long errorInterval = DEFAULT_ERROR_INTERVAL;
 
@@ -41,6 +38,13 @@ public abstract class AbstractCollector extends ScheduledJob implements Collecto
   private Monitor monitor = null;
 
   protected CollectorCache mib = new CollectorCache();
+
+
+
+
+  public AbstractCollector() {
+    executionInterval = DEFAULT_SAMPLE_INTERVAL;
+  }
 
 
 
@@ -212,7 +216,7 @@ public abstract class AbstractCollector extends ScheduledJob implements Collecto
     //Number of milliseconds between runs.
     if ( configuration.contains( MonitorConfig.SAMPLE_INTERVAL ) ) {
       try {
-        this.metricInterval = configuration.getAsLong( MonitorConfig.SAMPLE_INTERVAL );
+        executionInterval = configuration.getAsLong( MonitorConfig.SAMPLE_INTERVAL );
       } catch ( DataFrameException e ) {
         Log.error( LogMsg.createMsg( "Monitor.probe_config_sample_interval", e.getMessage() ) );
       }
