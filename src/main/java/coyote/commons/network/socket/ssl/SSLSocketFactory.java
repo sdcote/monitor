@@ -12,20 +12,20 @@
 package coyote.commons.network.socket.ssl;
 
 import java.io.File;
-import java.io.FileInputStream;
 import java.io.IOException;
 import java.net.InetAddress;
 import java.net.ServerSocket;
 import java.net.Socket;
-import java.security.KeyStore;
 import java.security.SecureRandom;
 import java.security.Security;
 import java.util.Random;
 
-import javax.net.ssl.KeyManagerFactory;
+import javax.net.ssl.HandshakeCompletedEvent;
+import javax.net.ssl.HandshakeCompletedListener;
 import javax.net.ssl.SSLContext;
 import javax.net.ssl.SSLServerSocketFactory;
 import javax.net.ssl.SSLSocket;
+import javax.net.ssl.TrustManager;
 
 import com.sun.net.ssl.internal.ssl.Provider;
 
@@ -40,7 +40,7 @@ import coyote.commons.network.socket.ISocketFactory;
  */
 public class SSLSocketFactory implements ISocketFactory {
 
-  static final String DEFAULT_PASSWORD = "bralyn";
+  static final String DEFAULT_PASSWORD = "Coyote";
 
   static final Random regularRandom = new Random();
 
@@ -80,40 +80,59 @@ public class SSLSocketFactory implements ISocketFactory {
 
   /**
    * Initialize the SSL keystore and socket factories
-   *
-   * @throws Exception
+   * 
+   * @see coyote.commons.network.socket.ISocketFactory#initialize()
    */
-  void initialize() throws Exception {
-    trustStore = System.getProperty( "javax.net.ssl.trustStore" );
-    home = System.getProperty( "java.home" );
-
-    if ( trustStore == null ) {
-      trustStore = String.valueOf( ( new StringBuffer( String.valueOf( home ) ) ).append( File.separator ).append( "lib" ).append( File.separator ).append( "security" ).append( File.separator ).append( "cacerts" ) );
-    }
-
-    trustStorePassword = System.getProperty( "javax.net.ssl.trustStorePassword" );
-
-    if ( trustStorePassword == null ) {
-      trustStorePassword = DEFAULT_PASSWORD;
-    }
-
-    char tspChars[] = trustStorePassword.toCharArray();
+  @Override
+  public void initialize() throws Exception {
 
     Security.addProvider( new Provider() );
 
     SecureRandom securerandom = new SecureRandom();
     securerandom.setSeed( regularRandom.nextLong() );
 
-    KeyManagerFactory keymanagerfactory = KeyManagerFactory.getInstance( "SunX509" );
-    KeyStore keystore = KeyStore.getInstance( "JKS" );
-    keystore.load( new FileInputStream( trustStore ), tspChars );
-    keymanagerfactory.init( keystore, tspChars );
-
     SSLContext sslcontext = SSLContext.getInstance( "SSL" );
-    sslcontext.init( keymanagerfactory.getKeyManagers(), null, securerandom );
 
+    // / / / / / / / / / / / / / / / / / / / / / / / / / / / / / / / / / / / / /
+    // develop a strategy for specifying a keystore for an X509 key manager
+    // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+
+    // Setup a trust manager using the requested keystore
+    trustStore = System.getProperty( "javax.net.ssl.trustStore" );
+
+    // if there is no trust store defined, use the cacerts file in the JRE home
+    if ( trustStore == null ) {
+      home = System.getProperty( "java.home" );
+      trustStore = String.valueOf( ( new StringBuffer( String.valueOf( home ) ) ).append( File.separator ).append( "lib" ).append( File.separator ).append( "security" ).append( File.separator ).append( "cacerts" ) );
+    }
+
+    // What is the password used to create the trust store
+    trustStorePassword = System.getProperty( "javax.net.ssl.trustStorePassword" );
+
+    // if none specified, use a default
+    if ( trustStorePassword == null ) {
+      trustStorePassword = DEFAULT_PASSWORD;
+    }
+
+    // Setup an X509 key manager
+    //    char tspChars[] = trustStorePassword.toCharArray();
+    //    KeyManagerFactory keymanagerfactory = KeyManagerFactory.getInstance( "SunX509" );
+    //    KeyStore keystore = KeyStore.getInstance( "JKS" );
+    //    keystore.load( new FileInputStream( trustStore ), tspChars );
+    //    keymanagerfactory.init( keystore, tspChars );
+    //    sslcontext.init( keymanagerfactory.getKeyManagers(), null, securerandom );
+
+    // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+
+    // Just use a trust-all manager until we design an easy to use strategy
+    sslcontext.init( null, new TrustManager[] { new TrustAllManager() }, null );
+
+    // / / / / / / / / / / / / / / / / / / / / / / / / / / / / / / / / / / / / /
+
+    // Get the socket factories for 
     socketFactory = sslcontext.getSocketFactory();
     serverSocketFactory = sslcontext.getServerSocketFactory();
+
   }
 
 
@@ -142,8 +161,9 @@ public class SSLSocketFactory implements ISocketFactory {
    */
   public Socket createSocket( Socket socket, String host, int port, boolean autoclose ) throws IOException {
     SSLSocket sslsocket = (SSLSocket)socketFactory.createSocket( socket, host, port, autoclose );
+    sslsocket.addHandshakeCompletedListener( new MyHandshakeListener() );
+    sslsocket.setUseClientMode( true );
     sslsocket.startHandshake();
-
     return sslsocket;
   }
 
@@ -165,7 +185,11 @@ public class SSLSocketFactory implements ISocketFactory {
    * @throws IOException if a connection could not be made
    */
   public Socket createSocket( InetAddress addr, int port ) throws IOException {
-    return socketFactory.createSocket( addr, port );
+    SSLSocket sslsocket = (SSLSocket)socketFactory.createSocket( addr, port );
+    sslsocket.addHandshakeCompletedListener( new MyHandshakeListener() );
+    sslsocket.setUseClientMode( true );
+    sslsocket.startHandshake();
+    return sslsocket;
   }
 
 
@@ -211,4 +235,12 @@ public class SSLSocketFactory implements ISocketFactory {
   public ServerSocket createServerSocket( int port, int backlog, InetAddress addr ) throws IOException {
     return serverSocketFactory.createServerSocket( port, backlog, addr );
   }
+
+  class MyHandshakeListener implements HandshakeCompletedListener {
+    public void handshakeCompleted( HandshakeCompletedEvent e ) {
+      System.out.println( "Handshake succesful!" );
+      System.out.println( "Session: " + e.getSession() );
+    }
+  }
+
 }

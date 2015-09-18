@@ -239,6 +239,7 @@ public class HttpResponse extends HttpMessage {
 
         if ( isTimedOut() ) {
           this.setStatusCode( 408 );
+          this.setReasonPhrase( "Client timed-out reading response from server" );
 
           break;
         }

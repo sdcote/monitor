@@ -90,4 +90,17 @@ public interface ISocketFactory {
    * @throws IOException if a connection could not be made
    */
   public abstract Socket createSocket( Socket socket, String host, int port, boolean autoclose ) throws IOException;
+
+
+
+
+  /**
+   * Initialize the socket factory.
+   * 
+   * <p>Should only be called once, after it has been instantiated.</p>
+   * 
+   * @throws Exception 
+   */
+  public abstract void initialize() throws Exception;
+
 }

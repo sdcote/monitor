@@ -32,7 +32,7 @@ import coyote.commons.network.socket.ISocketFactory;
  */
 public class TCPSocketFactory implements ISocketFactory {
 
-  /** The socketfactory we use to get our basic sockets */
+  /** The socket factory we use to get our basic sockets */
   private SocketFactory socketFactory;
 
   /** The ServerSocketFactory we use to get our ServerSockets */
@@ -135,4 +135,16 @@ public class TCPSocketFactory implements ISocketFactory {
   public ServerSocket createServerSocket( int port, int backlog, InetAddress addr ) throws IOException {
     return serverSocketFactory.createServerSocket( port, backlog, addr );
   }
+
+
+
+
+  /**
+   * No-op implementation - nothing to initialize for this factory.
+   * 
+   * @see coyote.commons.network.socket.ISocketFactory#initialize()
+   */
+  @Override
+  public void initialize() throws Exception {}
+
 }

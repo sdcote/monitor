@@ -84,12 +84,12 @@ public class SocketChannelFarmer implements Runnable {
 
 
 
- /**
-  *
-  * @param address
-  *
-  * @return
-  */
+  /**
+   *
+   * @param address
+   *
+   * @return
+   */
   public static InetAddress resolveAddress( String address ) {
     try {
       return InetAddress.getByName( address );

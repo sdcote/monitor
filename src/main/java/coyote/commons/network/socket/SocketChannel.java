@@ -39,14 +39,11 @@ import coyote.loader.log.Log;
  */
 public final class SocketChannel implements Runnable, IChannel {
 
-  /** Field DEFAULT_BACKLOG */
   public static final int DEFAULT_BACKLOG = 50;
 
-  /** Field protocolToFactoryClass */
-  static final Hashtable protocolToFactoryClass = new Hashtable();
+  static final Hashtable<String, String> protocolToFactoryClass = new Hashtable<String, String>();
 
-  /** Field protocolToFactory */
-  static final Hashtable protocolToFactory = new Hashtable();
+  static final Hashtable<String, ISocketFactory> protocolToFactory = new Hashtable<String, ISocketFactory>();
 
   /**
    * The SocketServer that created us and probably has a reference to a
@@ -81,6 +78,7 @@ public final class SocketChannel implements Runnable, IChannel {
   static {
     addFactory( "tcp", "coyote.commons.network.socket.tcp.TCPSocketFactory" );
     addFactory( "ssl", "coyote.commons.network.socket.ssl.SSLSocketFactory" );
+    addFactory( "https", "coyote.commons.network.socket.ssl.SSLSocketFactory" );
   }
 
 
@@ -254,15 +252,15 @@ public final class SocketChannel implements Runnable, IChannel {
 
     // Could not find a factory in the cache, get the class name based on the
     // protocol so we can create a new factory.
-    String classname = (String)protocolToFactoryClass.get( protocol );
+    String classname = protocolToFactoryClass.get( protocol );
 
     // If we could not find the proper factory class name
     if ( classname == null ) {
       // get the TCP socket factory as a default
-      classname = (String)protocolToFactoryClass.get( "tcp" );
+      classname = protocolToFactoryClass.get( "tcp" );
     }
 
-    // Mak sure we have at least a TCP socket factory
+    // Make sure we have at least a TCP socket factory
     if ( classname == null ) {
       // Jeese! we're worthless!
       return null;
@@ -270,11 +268,12 @@ public final class SocketChannel implements Runnable, IChannel {
 
     // Create an instance of the socket factory
     try {
-      Class clazz = ClassLoaderUtil.loadClass( classname );
+      Class<?> clazz = ClassLoaderUtil.loadClass( classname );
       ISocketFactory factory = (ISocketFactory)clazz.newInstance();
       addFactory( protocol, factory );
+      factory.initialize();
 
-      // return it to the requestor
+      // return it to the requester
       return factory;
     } catch ( Exception ex ) {
       ex.printStackTrace();
@@ -293,7 +292,7 @@ public final class SocketChannel implements Runnable, IChannel {
    * @param inetaddress
    * @param port
    *
-   * @return
+   * @return a valid URI
    */
   public static URI asURI( String scheme, InetAddress inetaddress, int port ) {
     try {
