@@ -109,7 +109,8 @@ public class HttpResponse extends HttpMessage {
   /**
    * Parses the inputstream using the RFC 2616 specification
    *
-   * @todo Support chunking as defined in RFC2068
+   * TODO Support chunking as defined in RFC2068
+   * 
    * @param in
    *
    * @throws HttpMessageException
