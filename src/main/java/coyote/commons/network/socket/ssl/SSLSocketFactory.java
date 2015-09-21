@@ -34,9 +34,6 @@ import coyote.commons.network.socket.ISocketFactory;
 
 /**
  * Class SSLSocketFactory
- *
- * @author Stephan D. Cote' - Enterprise Architecture
- * @version $Revision: 1.2 $
  */
 public class SSLSocketFactory implements ISocketFactory {
 
@@ -151,9 +148,9 @@ public class SSLSocketFactory implements ISocketFactory {
    * default factory.</p>
    *
    * @param socket the socket connection to wrap within the SSL socket
-   * @param host
-   * @param port the port on the given address
-   * @param autoclose
+   * @param addr the IP address of the server to which we connect
+   * @param port the port number on the given address
+   * @param autoclose close the underlying socket when this socket is closed 
    *
    * @return Socket connected to the specified host and address using SSL
    *
@@ -177,8 +174,8 @@ public class SSLSocketFactory implements ISocketFactory {
    * <p>This socket is configured using the socket options established for the
    * default factory.</p>
    *
-   * @param addr
-   * @param port
+   * @param addr the IP address of the server to which we connect
+   * @param port the port number on the given address
    *
    * @return Socket connected to the specified host and address
    *
@@ -202,8 +199,8 @@ public class SSLSocketFactory implements ISocketFactory {
    * <p>The socket is configured with the default socket options (such as accept
    * timeout)</p>
    *
-   * @param port
-   * @param backlog
+   * @param port - the port to which we listen
+   * @param backlog - how many connections are queued
    *
    * @return Socket on which we can listen()
    *
@@ -236,10 +233,13 @@ public class SSLSocketFactory implements ISocketFactory {
     return serverSocketFactory.createServerSocket( port, backlog, addr );
   }
 
+  /**
+   * 
+   */
   class MyHandshakeListener implements HandshakeCompletedListener {
     public void handshakeCompleted( HandshakeCompletedEvent e ) {
-      System.out.println( "Handshake succesful!" );
-      System.out.println( "Session: " + e.getSession() );
+      System.out.println( "SSL Handshake succesful!" );
+      System.out.println( "SSL Session: " + e.getSession() );
     }
   }
 
