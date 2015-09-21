@@ -29,13 +29,10 @@ import coyote.monitor.Sample;
  *
  * TODO implement connection timeout
  * TODO support POST, HEAD, PUT, DELETE and TRACE
- * TODO support Basic Authentication
- * TODO place header data in the sample and metric
+ * TODO support Basic Authentication via request.setHeader( BasicAuth.HEADER_NAME, new BasicAuth( username, password ).toString() );
+ * TODO place response header data in the sample and metric
  * TODO Proxy-aware
  * TODO NTLM proxy support
- *
- * @author Stephan D. Cote' - Enterprise Architecture
- * @version $Revision: 1.7 $
  */
 public class HttpProbe extends AbstractProbe {
 
@@ -183,7 +180,7 @@ public class HttpProbe extends AbstractProbe {
           String previousSignature = null;
 
           if ( prev != null ) {
-            previousSignature = prev.getAsString( SIGNATURE);
+            previousSignature = prev.getAsString( SIGNATURE );
           }
 
           // If the current and previous signatures do not match, set the
@@ -244,7 +241,7 @@ public class HttpProbe extends AbstractProbe {
     //cfg.put( HttpProbe.DESTINATION_URI, "http://www.tripod.lycos.com:80" );
     //cfg.put( HttpProbe.DESTINATION_URI, "http://www.tripod.lycos.com/adm/unknown_host.html" );
     // cfg.put( HttpProbe.DESTINATION_URI, "http://www.google.com" );
-    cfg.put( HttpProbe.DESTINATION_URI, "http://spot.nwie.net" );
+    cfg.put( HttpProbe.DESTINATION_URI, "https://www.github.com" );
 
     // Show the configuration
     Log.info( cfg.toFormattedString() );
@@ -261,7 +258,7 @@ public class HttpProbe extends AbstractProbe {
     // Close the probe
     probe.terminate();
 
-    // Disply the sample taken
+    // Display the sample taken
     Log.info( JSONMarshaler.toFormattedString( sample ) );
 
   }

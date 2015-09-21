@@ -11,29 +11,37 @@
  */
 package coyote.commons.network.socket.ssl;
 
-import java.io.File;
 import java.io.IOException;
 import java.net.InetAddress;
 import java.net.ServerSocket;
 import java.net.Socket;
-import java.security.SecureRandom;
 import java.security.Security;
 import java.util.Random;
 
 import javax.net.ssl.HandshakeCompletedEvent;
 import javax.net.ssl.HandshakeCompletedListener;
-import javax.net.ssl.SSLContext;
-import javax.net.ssl.SSLServerSocketFactory;
 import javax.net.ssl.SSLSocket;
-import javax.net.ssl.TrustManager;
-
-import com.sun.net.ssl.internal.ssl.Provider;
 
 import coyote.commons.network.socket.ISocketFactory;
 
 
 /**
  * Class SSLSocketFactory
+ * 
+ * http://docs.oracle.com/javase/1.5.0/docs/guide/security/jsse/JSSERefGuide.html
+ * 
+ * Logging debug events: 
+ * http://docs.oracle.com/javase/1.5.0/docs/guide/security/jsse/JSSERefGuide.html#Debug
+ * 
+ * java -Djavax.net.debug=all -Djavax.net.ssl.trustStore=trustStore ...
+ * 
+ * 
+ * understand the difference between the keystore (in which you have the 
+ * private key and cert you prove your own identity with) and the trust store 
+ * (which determines who you trust) - and the fact that your own identity also 
+ * has a 'chain' of trust to the root - which is separate from any chain to a 
+ * root you need to figure out 'who' you trust.
+ * 
  */
 public class SSLSocketFactory implements ISocketFactory {
 
@@ -49,7 +57,7 @@ public class SSLSocketFactory implements ISocketFactory {
 
   javax.net.ssl.SSLSocketFactory socketFactory;
 
-  SSLServerSocketFactory serverSocketFactory;
+  javax.net.ssl.SSLServerSocketFactory serverSocketFactory;
 
 
 
@@ -83,53 +91,11 @@ public class SSLSocketFactory implements ISocketFactory {
   @Override
   public void initialize() throws Exception {
 
-    Security.addProvider( new Provider() );
+    Security.addProvider( new com.sun.net.ssl.internal.ssl.Provider() );
 
-    SecureRandom securerandom = new SecureRandom();
-    securerandom.setSeed( regularRandom.nextLong() );
-
-    SSLContext sslcontext = SSLContext.getInstance( "SSL" );
-
-    // / / / / / / / / / / / / / / / / / / / / / / / / / / / / / / / / / / / / /
-    // develop a strategy for specifying a keystore for an X509 key manager
-    // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-
-    // Setup a trust manager using the requested keystore
-    trustStore = System.getProperty( "javax.net.ssl.trustStore" );
-
-    // if there is no trust store defined, use the cacerts file in the JRE home
-    if ( trustStore == null ) {
-      home = System.getProperty( "java.home" );
-      trustStore = String.valueOf( ( new StringBuffer( String.valueOf( home ) ) ).append( File.separator ).append( "lib" ).append( File.separator ).append( "security" ).append( File.separator ).append( "cacerts" ) );
-    }
-
-    // What is the password used to create the trust store
-    trustStorePassword = System.getProperty( "javax.net.ssl.trustStorePassword" );
-
-    // if none specified, use a default
-    if ( trustStorePassword == null ) {
-      trustStorePassword = DEFAULT_PASSWORD;
-    }
-
-    // Setup an X509 key manager
-    //    char tspChars[] = trustStorePassword.toCharArray();
-    //    KeyManagerFactory keymanagerfactory = KeyManagerFactory.getInstance( "SunX509" );
-    //    KeyStore keystore = KeyStore.getInstance( "JKS" );
-    //    keystore.load( new FileInputStream( trustStore ), tspChars );
-    //    keymanagerfactory.init( keystore, tspChars );
-    //    sslcontext.init( keymanagerfactory.getKeyManagers(), null, securerandom );
-
-    // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-
-    // Just use a trust-all manager until we design an easy to use strategy
-    sslcontext.init( null, new TrustManager[] { new TrustAllManager() }, null );
-
-    // / / / / / / / / / / / / / / / / / / / / / / / / / / / / / / / / / / / / /
-
-    // Get the socket factories for 
-    socketFactory = sslcontext.getSocketFactory();
-    serverSocketFactory = sslcontext.getServerSocketFactory();
-
+    // Get the socket factories for creating sockets
+    socketFactory = (javax.net.ssl.SSLSocketFactory)javax.net.ssl.SSLSocketFactory.getDefault();
+    serverSocketFactory = (javax.net.ssl.SSLServerSocketFactory)javax.net.ssl.SSLServerSocketFactory.getDefault();
   }
 
 

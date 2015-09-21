@@ -30,6 +30,11 @@ import coyote.commons.StringUtil;
  * <p>For example, if the user agent uses 'Aladdin' as the username and 
  * 'open sesame' as the password then the field is formed as follows:<pre>
  * Authorization: Basic QWxhZGRpbjpvcGVuIHNlc2FtZQ==</pre></p> 
+ * 
+ * <p>This is designed to be added to the headers of the request in the following manner:<pre>
+ * request.setHeader( BasicAuth.HEADER_NAME, new BasicAuth( username, password ).toString() );</pre>
+ * The result should be an "Authorization" header populated with the necessary
+ * values.</p>
  */
 public class BasicAuth {
   private static final String BASIC = "Basic";
