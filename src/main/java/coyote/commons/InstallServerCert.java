@@ -45,8 +45,8 @@ import javax.net.ssl.X509TrustManager;
  * <p>Basically, you want to add the server's certificate to the KeyStore with 
  * your trusted certificates. There are any number of ways to achieve that, but 
  * a simple solution is to compile and run the attached program as {@code java 
- * InstallCert hostname}, for example:<pre>
- * % java InstallCert ecc.fedora.redhat.com
+ * InstallServerCert hostname}, for example:<pre>
+ * % java InstallServerCert ecc.fedora.redhat.com
  * Loading KeyStore
  *  /usr/jdk/instances/jdk1.5.0/jre/lib/security/cacerts...
  *  Opening connection to ecc.fedora.redhat.com:443...
@@ -94,6 +94,7 @@ public class InstallServerCert {
   private static final char[] HEXDIGITS = "0123456789ABCDEF".toCharArray();
   private static int DEFAULT_PORT = 443;
   private static String DEFAULT_PHRASE = "changeit";
+  private static final X509Certificate[] NO_CERTS = new X509Certificate[0];
 
 
 
@@ -118,7 +119,7 @@ public class InstallServerCert {
       passphrase = p.toCharArray();
 
     } else {
-      System.out.println( "Usage: java InstallCert [:port] [passphrase]" );
+      System.out.println( "Usage: java InstallServerCert [:port] [passphrase]" );
       System.out.println( "    port defaults to '" + DEFAULT_PORT + "'" );
       System.out.println( "    passphrase defaults to '" + DEFAULT_PHRASE + "'" );
       return;
@@ -140,9 +141,9 @@ public class InstallServerCert {
     in.close();
 
     SSLContext context = SSLContext.getInstance( "TLS" );
-    TrustManagerFactory tmf = TrustManagerFactory.getInstance( TrustManagerFactory.getDefaultAlgorithm() );
-    tmf.init( keystore );
-    X509TrustManager defaultTrustManager = (X509TrustManager)tmf.getTrustManagers()[0];
+    TrustManagerFactory tmfactory = TrustManagerFactory.getInstance( TrustManagerFactory.getDefaultAlgorithm() );
+    tmfactory.init( keystore );
+    X509TrustManager defaultTrustManager = (X509TrustManager)tmfactory.getTrustManagers()[0];
     SavingTrustManager trustmanager = new SavingTrustManager( defaultTrustManager );
     context.init( null, new TrustManager[] { trustmanager }, null );
     SSLSocketFactory factory = context.getSocketFactory();
@@ -159,7 +160,8 @@ public class InstallServerCert {
       System.out.println();
       System.out.println( e.getMessage() );
       e.printStackTrace( System.out );
-    } finally{
+    }
+    finally {
       socket.close();
     }
 
@@ -230,28 +232,29 @@ public class InstallServerCert {
    */
   private static class SavingTrustManager implements X509TrustManager {
 
-    private final X509TrustManager tm;
+    private final X509TrustManager parent;
     private X509Certificate[] certificateChain;
 
 
 
 
     SavingTrustManager( X509TrustManager tm ) {
-      this.tm = tm;
+      parent = tm;
     }
 
 
 
 
     public X509Certificate[] getAcceptedIssuers() {
-      return null;//throw new UnsupportedOperationException();
+      return NO_CERTS;
     }
 
 
 
 
     public void checkClientTrusted( X509Certificate[] chain, String authType ) throws CertificateException {
-      //throw new UnsupportedOperationException();
+      this.certificateChain = chain;
+      parent.checkClientTrusted( chain, authType );
     }
 
 
@@ -259,7 +262,9 @@ public class InstallServerCert {
 
     public void checkServerTrusted( X509Certificate[] chain, String authType ) throws CertificateException {
       this.certificateChain = chain;
-      tm.checkServerTrusted( chain, authType );
+      parent.checkServerTrusted( chain, authType );
     }
+
   }
+
 }

@@ -32,6 +32,7 @@ import javax.net.ssl.TrustManager;
 import com.sun.net.ssl.internal.ssl.Provider;
 
 import coyote.commons.network.socket.ISocketFactory;
+import coyote.loader.log.Log;
 
 
 /**
@@ -119,6 +120,7 @@ public class SSLSocketFactory implements ISocketFactory {
       home = System.getProperty( "java.home" );
       trustStore = String.valueOf( ( new StringBuffer( String.valueOf( home ) ) ).append( File.separator ).append( "lib" ).append( File.separator ).append( "security" ).append( File.separator ).append( "cacerts" ) );
     }
+    Log.trace("Using a truststore of "+trustStore);
 
     // What is the password used to create the trust store
     trustStorePassword = System.getProperty( "javax.net.ssl.trustStorePassword" );
@@ -127,6 +129,7 @@ public class SSLSocketFactory implements ISocketFactory {
     if ( trustStorePassword == null ) {
       trustStorePassword = DEFAULT_PASSWORD;
     }
+    Log.trace("Using a passphrase of "+trustStorePassword);
 
     // Setup an X509 key manager
     char tspChars[] = trustStorePassword.toCharArray();

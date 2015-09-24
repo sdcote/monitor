@@ -27,7 +27,7 @@ public interface ISocketFactory {
    * address and port.
    *
    * @param hostaddress - the InetAddress to which we want to connect
-   * @param port - the int representing the port on the given address
+   * @param port - the integer representing the port on the given address
    *
    * @return Socket connected to the specified host and address
    *
