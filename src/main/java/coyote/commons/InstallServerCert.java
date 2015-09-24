@@ -89,13 +89,21 @@ import javax.net.ssl.X509TrustManager;
  * the generated “jssecacerts” file to your “$JAVA_HOME\jre\lib\security” folder.
  * 
  */
-public class InstallCert {
+public class InstallServerCert {
 
   private static final char[] HEXDIGITS = "0123456789ABCDEF".toCharArray();
+  private static int DEFAULT_PORT = 443;
+  private static String DEFAULT_PHRASE = "changeit";
 
 
 
 
+  /**
+   * 
+   * @param args
+   * 
+   * @throws Exception
+   */
   public static void main( String[] args ) throws Exception {
     String host;
     int port;
@@ -103,11 +111,16 @@ public class InstallCert {
     if ( ( args.length == 1 ) || ( args.length == 2 ) ) {
       String[] c = args[0].split( ":" );
       host = c[0];
-      port = ( c.length == 1 ) ? 443 : Integer.parseInt( c[1] );
-      String p = ( args.length == 1 ) ? "changeit" : args[1];
+
+      port = ( c.length == 1 ) ? DEFAULT_PORT : Integer.parseInt( c[1] );
+
+      String p = ( args.length == 1 ) ? DEFAULT_PHRASE : args[1];
       passphrase = p.toCharArray();
+
     } else {
       System.out.println( "Usage: java InstallCert [:port] [passphrase]" );
+      System.out.println( "    port defaults to '" + DEFAULT_PORT + "'" );
+      System.out.println( "    passphrase defaults to '" + DEFAULT_PHRASE + "'" );
       return;
     }
 
@@ -122,16 +135,16 @@ public class InstallCert {
     }
     System.out.println( "Loading KeyStore " + file + "..." + file.getAbsolutePath() );
     InputStream in = new FileInputStream( file );
-    KeyStore ks = KeyStore.getInstance( KeyStore.getDefaultType() );
-    ks.load( in, passphrase );
+    KeyStore keystore = KeyStore.getInstance( KeyStore.getDefaultType() );
+    keystore.load( in, passphrase );
     in.close();
 
     SSLContext context = SSLContext.getInstance( "TLS" );
     TrustManagerFactory tmf = TrustManagerFactory.getInstance( TrustManagerFactory.getDefaultAlgorithm() );
-    tmf.init( ks );
+    tmf.init( keystore );
     X509TrustManager defaultTrustManager = (X509TrustManager)tmf.getTrustManagers()[0];
-    SavingTrustManager tm = new SavingTrustManager( defaultTrustManager );
-    context.init( null, new TrustManager[] { tm }, null );
+    SavingTrustManager trustmanager = new SavingTrustManager( defaultTrustManager );
+    context.init( null, new TrustManager[] { trustmanager }, null );
     SSLSocketFactory factory = context.getSocketFactory();
 
     System.out.println( "Opening connection to " + host + ":" + port + "..." );
@@ -140,16 +153,17 @@ public class InstallCert {
     try {
       System.out.println( "Starting SSL handshake..." );
       socket.startHandshake();
-      socket.close();
       System.out.println();
       System.out.println( "No errors, certificate is already trusted" );
     } catch ( SSLException e ) {
       System.out.println();
       System.out.println( e.getMessage() );
       e.printStackTrace( System.out );
+    } finally{
+      socket.close();
     }
 
-    X509Certificate[] chain = tm.chain;
+    X509Certificate[] chain = trustmanager.certificateChain;
     if ( chain == null ) {
       System.out.println( "Could not obtain server certificate chain" );
       return;
@@ -185,10 +199,10 @@ public class InstallCert {
 
     X509Certificate cert = chain[k];
     String alias = host + "-" + ( k + 1 );
-    ks.setCertificateEntry( alias, cert );
+    keystore.setCertificateEntry( alias, cert );
 
     OutputStream out = new FileOutputStream( "jssecacerts" );
-    ks.store( out, passphrase );
+    keystore.store( out, passphrase );
     out.close();
 
     System.out.println();
@@ -217,7 +231,7 @@ public class InstallCert {
   private static class SavingTrustManager implements X509TrustManager {
 
     private final X509TrustManager tm;
-    private X509Certificate[] chain;
+    private X509Certificate[] certificateChain;
 
 
 
@@ -244,7 +258,7 @@ public class InstallCert {
 
 
     public void checkServerTrusted( X509Certificate[] chain, String authType ) throws CertificateException {
-      this.chain = chain;
+      this.certificateChain = chain;
       tm.checkServerTrusted( chain, authType );
     }
   }
