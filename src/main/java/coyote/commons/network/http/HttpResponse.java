@@ -88,11 +88,15 @@ public class HttpResponse extends HttpMessage {
 
   /**
    * Method reset
+   * 
+   * called by {@link #parse(InputStream)}
    */
   public void reset() {
+    // clear out headers
     super.reset();
-    super.setContentType( DEFAULT_CONTENT_TYPE );
-    setTimeout( DEFAULT_TIMEOUT );
+
+    // Set the default response content type
+    setContentType( DEFAULT_CONTENT_TYPE );
 
     this.date = new Date();
     this.statusCode = 200;
@@ -107,7 +111,9 @@ public class HttpResponse extends HttpMessage {
 
 
   /**
-   * Parses the inputstream using the RFC 2616 specification
+   * Parses the input stream using the RFC 2616 specification
+   * 
+   * This parses the input stream when running as a client
    *
    * TODO Support chunking as defined in RFC2068
    * 
@@ -118,6 +124,8 @@ public class HttpResponse extends HttpMessage {
   public void parse( InputStream in ) throws HttpMessageException {
     // clear out everything
     reset();
+
+    Log.append( HTTP, "Reading response..." );
 
     if ( in != null ) {
       // Start our time-out timer

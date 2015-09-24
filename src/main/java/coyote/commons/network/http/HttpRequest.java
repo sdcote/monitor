@@ -54,6 +54,9 @@ public class HttpRequest extends HttpMessage {
    */
   private static final String HTTP_ENCODING = "ASCII";
 
+  /** The default user agent value we use */
+  private static final String DEFAULT_USER_AGENT = "Mozilla/5.0 (compatible; CoyoteHTTP; Java) like Gecko";
+
   /** The encoding we use of this request */
   private String encoding = HTTP_ENCODING;
 
@@ -77,7 +80,7 @@ public class HttpRequest extends HttpMessage {
     setHeader( ACCEPT, "image/gif, image/x-xbitmap, image/jpeg, image/pjpeg, */*" );
     setHeader( ACCEPT_LANGUAGE, "en" );
     setHeader( ACCEPT_ENCODING, "gzip, deflate" );
-    setHeader( USER_AGENT, "Mozilla/4.0 (compatible; CoyoteHTTP; Java)" );
+    setHeader( USER_AGENT, DEFAULT_USER_AGENT );
     setHeader( CONNECTION, KEEP_ALIVE );
   }
 
@@ -119,7 +122,11 @@ public class HttpRequest extends HttpMessage {
 
 
   /**
-   * Parses the inputstream using the RFC 2616 specification
+   * Parses the input stream using the RFC 2616 specification.
+   * 
+   * This reads in a request from the input stream
+   * 
+   * This is when the the code is operating as a server
    *
    * @param in
    *
@@ -144,7 +151,7 @@ public class HttpRequest extends HttpMessage {
             }
 
             if ( ( request != null ) && ( request.length() > 0 ) ) {
-              Log.append( HTTP, getClass().getName() + ".parse HTTPRequest parsing: '" + request + "'" );
+              Log.append( HTTP, getClass().getSimpleName() + ".parse HTTPRequest parsing: '" + request + "'" );
 
               // RFC2616 section 5.1
               int mark = 0;
@@ -192,11 +199,11 @@ public class HttpRequest extends HttpMessage {
 
             // Many requests, SOAP for example, have a body
             if ( in.available() > 0 ) {
-              Log.append( HTTP, getClass().getName() + ".parse there are " + in.available() + " bytes available, calling readBody()" );
+              Log.append( HTTP, getClass().getSimpleName() + ".parse there are " + in.available() + " bytes available, calling readBody()" );
               readBody( in );
             }
           } catch ( Exception ex ) {
-            Log.error( "HttpRequest threw " + ex.getClass().getName() + "\r\n" + ex.getMessage() );
+            Log.error( "HttpRequest threw " + ex.getClass().getSimpleName() + "\r\n" + ex.getMessage() );
           }
         } else {
           throw new HttpMessageException( "No data available from inputstream" );
@@ -476,10 +483,13 @@ public class HttpRequest extends HttpMessage {
         response.remoteAddress = remoteAddress;
         response.remotePort = remotePort;
 
+        // set the timeout to match ours
+        response.setTimeout( this.getTimeout() );
+        
         // Send the request over the socket we just opened
         channel.getOutputStream().write( toString().getBytes( HTTP_ENCODING ) );
         channel.getOutputStream().flush();
-        Log.append( HTTP, getClass().getName() + "Sent:\n" + toString() );
+        Log.append( HTTP, getClass().getSimpleName() + " Sent:\n" + toString() );
 
         response.setRequestSent( System.currentTimeMillis() );
 

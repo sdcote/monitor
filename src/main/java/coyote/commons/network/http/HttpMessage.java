@@ -106,7 +106,11 @@ public class HttpMessage {
   public static final String TEXT_HTML = "text/html";
 
   public static final String POST = "POST";
-
+  public static final String PUT = "PUT";
+  public static final String HEAD = "HEAD";
+  public static final String DELETE = "DELETE";
+  public static final String OPTIONS = "OPTIONS";
+  public static final String CONNECT = "CONNECT";
   public static final String GET = "GET";
 
   public static final String DATE = "Date";
@@ -124,8 +128,6 @@ public class HttpMessage {
   public static final String BASIC = "Basic";
 
   public static final String WWW_AUTHENTICATE = "WWW-Authenticate";
-
-  public static final String CONNECT = "CONNECT";
 
   public static final String OK = "OK";
 
@@ -506,58 +508,6 @@ public class HttpMessage {
    */
   protected boolean isTimedOut() {
     return System.currentTimeMillis() >= abortTime;
-  }
-
-
-
-
-  /**
-   * Method isHex
-   *
-   * @param c
-   *
-   * @return
-   */
-  private static boolean isHex( char c ) {
-    return Character.digit( c, 16 ) != -1;
-  }
-
-
-
-
-  /**
-   * Method fromHTTP
-   *
-   * @param token
-   *
-   * @deprecated use decodeHtmlString instead
-   *
-   * @return
-   */
-  public static String fromHTTP( String token ) {
-    token = token.replace( '+', ' ' );
-
-    int i = token.indexOf( '%' );
-
-    if ( i == -1 ) {
-      return token;
-    }
-
-    int j = token.length();
-
-    if ( ( i + 2 >= j ) || !isHex( token.charAt( i + 1 ) ) || !isHex( token.charAt( i + 2 ) ) ) {
-      return token;
-    }
-
-    StringBuffer stringbuffer = new StringBuffer();
-    stringbuffer.append( token.substring( 0, i ) );
-    stringbuffer.append( (char)Integer.parseInt( token.substring( i + 1, i + 3 ), 16 ) );
-
-    if ( i + 3 < j ) {
-      stringbuffer.append( decodeHtmlString( token.substring( i + 3 ) ) );
-    }
-
-    return stringbuffer.toString();
   }
 
 
@@ -1278,9 +1228,8 @@ public class HttpMessage {
 
 
   /**
-   * Method getTimeout
-   *
-   * @return
+   * @return the number of milliseconds to wait for a response from the other 
+   *         end of the connection.
    */
   public int getTimeout() {
     return timeout;
@@ -1290,9 +1239,9 @@ public class HttpMessage {
 
 
   /**
-   * Method setTimeout
+   * Set the amount of time the we wait for a response from the other end. 
    *
-   * @param timeout
+   * @param timeout the number of milliseconds to wait.
    */
   public void setTimeout( int timeout ) {
     this.timeout = timeout;
@@ -1311,7 +1260,8 @@ public class HttpMessage {
    * <p>If there is no body to the message, a byte array with zero elements
    * ( byte[0] ) will be returned.</p>
    *
-   * @return a byte[] containing the body of the message as it was received or a byte[] of zero size if there is no body.
+   * @return a byte[] containing the body of the message as it was received or 
+   *         a byte[] of zero size if there is no body.
    */
   public byte[] getBody() {
     if ( output != null ) {
@@ -1327,10 +1277,11 @@ public class HttpMessage {
   /**
    * Set the body of the message to the given data.
    *
-   * <p> If the data is null or contains no data, the body of the message will
+   * <p>If the data is null or contains no data, the body of the message will
    * contain no bytes, but will not be set to null.</p>
    *
-   * @param data the byte array representing the data to place in the body of the message.
+   * @param data the byte array representing the data to place in the body of 
+   *             the message.
    *
    * @throws HttpMessageException
    */
