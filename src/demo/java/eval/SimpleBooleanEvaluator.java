@@ -32,19 +32,21 @@ public class SimpleBooleanEvaluator extends AbstractEvaluator<Boolean> {
 
 
 
-  public SimpleBooleanEvaluator() {
-    super( PARAMETERS );
+  public static void main( final String[] args ) {
+    final SimpleBooleanEvaluator evaluator = new SimpleBooleanEvaluator();
+    String expression = "true && false";
+    System.out.println( expression + " = " + evaluator.evaluate( expression ) );
+    expression = "true || false";
+    System.out.println( expression + " = " + evaluator.evaluate( expression ) );
+    expression = "!true";
+    System.out.println( expression + " = " + evaluator.evaluate( expression ) );
   }
 
 
 
 
-  /**
-   * @see coyote.commons.eval.AbstractEvaluator#toValue(java.lang.String, java.lang.Object)
-   */
-  @Override
-  protected Boolean toValue( String literal, Object evaluationContext ) {
-    return Boolean.valueOf( literal );
+  public SimpleBooleanEvaluator() {
+    super( PARAMETERS );
   }
 
 
@@ -54,16 +56,16 @@ public class SimpleBooleanEvaluator extends AbstractEvaluator<Boolean> {
    * @see coyote.commons.eval.AbstractEvaluator#evaluate(coyote.commons.eval.Operator, java.util.Iterator, java.lang.Object)
    */
   @Override
-  protected Boolean evaluate( Operator operator, Iterator<Boolean> operands, Object evaluationContext ) {
+  protected Boolean evaluate( final Operator operator, final Iterator<Boolean> operands, final Object evaluationContext ) {
     if ( operator == NEGATE ) {
       return !operands.next();
     } else if ( operator == OR ) {
-      Boolean o1 = operands.next();
-      Boolean o2 = operands.next();
+      final Boolean o1 = operands.next();
+      final Boolean o2 = operands.next();
       return o1 || o2;
     } else if ( operator == AND ) {
-      Boolean o1 = operands.next();
-      Boolean o2 = operands.next();
+      final Boolean o1 = operands.next();
+      final Boolean o2 = operands.next();
       return o1 && o2;
     } else {
       return super.evaluate( operator, operands, evaluationContext );
@@ -73,13 +75,11 @@ public class SimpleBooleanEvaluator extends AbstractEvaluator<Boolean> {
 
 
 
-  public static void main( String[] args ) {
-    SimpleBooleanEvaluator evaluator = new SimpleBooleanEvaluator();
-    String expression = "true && false";
-    System.out.println( expression + " = " + evaluator.evaluate( expression ) );
-    expression = "true || false";
-    System.out.println( expression + " = " + evaluator.evaluate( expression ) );
-    expression = "!true";
-    System.out.println( expression + " = " + evaluator.evaluate( expression ) );
+  /**
+   * @see coyote.commons.eval.AbstractEvaluator#toValue(java.lang.String, java.lang.Object)
+   */
+  @Override
+  protected Boolean toValue( final String literal, final Object evaluationContext ) {
+    return Boolean.valueOf( literal );
   }
 }

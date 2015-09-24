@@ -35,6 +35,21 @@ public class TextualOperatorsEvaluator extends AbstractEvaluator<Boolean> {
 
 
 
+  public static void main( final String[] args ) {
+
+    final Map<String, String> variableToValue = new HashMap<String, String>();
+    variableToValue.put( "type", "PORT" );
+
+    final AbstractEvaluator<Boolean> evaluator = new TextualOperatorsEvaluator();
+
+    System.out.println( "type=PORT -> " + evaluator.evaluate( "type=PORT", variableToValue ) );
+    System.out.println( "type=NORTH -> " + evaluator.evaluate( "type=NORTH", variableToValue ) );
+    System.out.println( "type=PORT AND true -> " + evaluator.evaluate( "type=PORT AND true", variableToValue ) );
+  }
+
+
+
+
   public TextualOperatorsEvaluator() {
     super( PARAMETERS );
   }
@@ -42,32 +57,20 @@ public class TextualOperatorsEvaluator extends AbstractEvaluator<Boolean> {
 
 
 
+  /**
+   * @see coyote.commons.eval.AbstractEvaluator#evaluate(coyote.commons.eval.Operator, java.util.Iterator, java.lang.Object)
+   */
   @Override
-  protected Boolean toValue( String literal, Object evaluationContext ) {
-    int index = literal.indexOf( '=' );
-    if ( index >= 0 ) {
-      String variable = literal.substring( 0, index );
-      String value = literal.substring( index + 1 );
-      return value.equals( ( (Map<String, String>)evaluationContext ).get( variable ) );
-    } else {
-      return Boolean.valueOf( literal );
-    }
-  }
-
-
-
-
-  @Override
-  protected Boolean evaluate( Operator operator, Iterator<Boolean> operands, Object evaluationContext ) {
+  protected Boolean evaluate( final Operator operator, final Iterator<Boolean> operands, final Object evaluationContext ) {
     if ( operator == NEGATE ) {
       return !operands.next();
     } else if ( operator == OR ) {
-      Boolean o1 = operands.next();
-      Boolean o2 = operands.next();
+      final Boolean o1 = operands.next();
+      final Boolean o2 = operands.next();
       return o1 || o2;
     } else if ( operator == AND ) {
-      Boolean o1 = operands.next();
-      Boolean o2 = operands.next();
+      final Boolean o1 = operands.next();
+      final Boolean o2 = operands.next();
       return o1 && o2;
     } else {
       return super.evaluate( operator, operands, evaluationContext );
@@ -77,20 +80,29 @@ public class TextualOperatorsEvaluator extends AbstractEvaluator<Boolean> {
 
 
 
+  /**
+   * @see coyote.commons.eval.AbstractEvaluator#tokenize(java.lang.String)
+   */
   @Override
-  protected Iterator<String> tokenize( String expression ) {
+  protected Iterator<String> tokenize( final String expression ) {
     return Arrays.asList( expression.split( "\\s" ) ).iterator();
   }
 
 
 
 
-  public static void main( String[] args ) {
-    Map<String, String> variableToValue = new HashMap<String, String>();
-    variableToValue.put( "type", "PORT" );
-    AbstractEvaluator<Boolean> evaluator = new TextualOperatorsEvaluator();
-    System.out.println( "type=PORT -> " + evaluator.evaluate( "type=PORT", variableToValue ) );
-    System.out.println( "type=NORTH -> " + evaluator.evaluate( "type=NORTH", variableToValue ) );
-    System.out.println( "type=PORT AND true -> " + evaluator.evaluate( "type=PORT AND true", variableToValue ) );
+  /**
+   * @see coyote.commons.eval.AbstractEvaluator#toValue(java.lang.String, java.lang.Object)
+   */
+  @Override
+  protected Boolean toValue( final String literal, final Object evaluationContext ) {
+    final int index = literal.indexOf( '=' );
+    if ( index >= 0 ) {
+      final String variable = literal.substring( 0, index );
+      final String value = literal.substring( index + 1 );
+      return value.equals( ( (Map<String, String>)evaluationContext ).get( variable ) );
+    } else {
+      return Boolean.valueOf( literal );
+    }
   }
 }
