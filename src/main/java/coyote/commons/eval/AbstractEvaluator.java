@@ -42,17 +42,17 @@ public abstract class AbstractEvaluator<T> {
   protected AbstractEvaluator( Parameters parameters ) {
     //TODO if constants, operators, functions are duplicated => error
     final ArrayList<String> tokenDelimitersBuilder = new ArrayList<String>();
-    this.functions = new HashMap<String, Function>();
-    this.operators = new HashMap<String, List<Operator>>();
-    this.constants = new HashMap<String, Constant>();
-    this.functionBrackets = new HashMap<String, BracketPair>();
+    functions = new HashMap<String, Function>();
+    operators = new HashMap<String, List<Operator>>();
+    constants = new HashMap<String, Constant>();
+    functionBrackets = new HashMap<String, BracketPair>();
     for ( final BracketPair pair : parameters.getFunctionBrackets() ) {
       functionBrackets.put( pair.getOpen(), pair );
       functionBrackets.put( pair.getClose(), pair );
       tokenDelimitersBuilder.add( pair.getOpen() );
       tokenDelimitersBuilder.add( pair.getClose() );
     }
-    this.expressionBrackets = new HashMap<String, BracketPair>();
+    expressionBrackets = new HashMap<String, BracketPair>();
     for ( final BracketPair pair : parameters.getExpressionBrackets() ) {
       expressionBrackets.put( pair.getOpen(), pair );
       expressionBrackets.put( pair.getClose(), pair );

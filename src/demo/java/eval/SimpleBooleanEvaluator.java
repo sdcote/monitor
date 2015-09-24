@@ -1,0 +1,96 @@
+/*
+ * Copyright (c) 2015 Stephan D. Cote' - All rights reserved.
+ * 
+ * This program and the accompanying materials are made available under the 
+ * terms of the MIT License which accompanies this distribution, and is 
+ * available at http://creativecommons.org/licenses/MIT/
+ *
+ * Contributors:
+ *   Stephan D. Cote 
+ *      - Initial concept and initial implementation
+ */
+package eval;
+
+import java.util.Iterator;
+
+import coyote.commons.eval.AbstractEvaluator;
+import coyote.commons.eval.Operator;
+import coyote.commons.eval.Parameters;
+
+
+/**
+ * An example of how to implement an evaluator from scratch.
+ */
+public class SimpleBooleanEvaluator extends AbstractEvaluator<Boolean> {
+  /** The negate unary operator.*/
+  public final static Operator NEGATE = new Operator( "!", 1, Operator.Associativity.RIGHT, 3 );
+  /** The logical AND operator.*/
+  private static final Operator AND = new Operator( "&&", 2, Operator.Associativity.LEFT, 2 );
+  /** The logical OR operator.*/
+  public final static Operator OR = new Operator( "||", 2, Operator.Associativity.LEFT, 1 );
+
+  private static final Parameters PARAMETERS;
+
+  static {
+    // Create the evaluator's parameters
+    PARAMETERS = new Parameters();
+    // Add the supported operators
+    PARAMETERS.add( AND );
+    PARAMETERS.add( OR );
+    PARAMETERS.add( NEGATE );
+  }
+
+
+
+
+  public SimpleBooleanEvaluator() {
+    super( PARAMETERS );
+  }
+
+
+
+
+  /**
+   * @see coyote.commons.eval.AbstractEvaluator#toValue(java.lang.String, java.lang.Object)
+   */
+  @Override
+  protected Boolean toValue( String literal, Object evaluationContext ) {
+    return Boolean.valueOf( literal );
+  }
+
+
+
+
+  /**
+   * @see coyote.commons.eval.AbstractEvaluator#evaluate(coyote.commons.eval.Operator, java.util.Iterator, java.lang.Object)
+   */
+  @Override
+  protected Boolean evaluate( Operator operator, Iterator<Boolean> operands, Object evaluationContext ) {
+    if ( operator == NEGATE ) {
+      return !operands.next();
+    } else if ( operator == OR ) {
+      Boolean o1 = operands.next();
+      Boolean o2 = operands.next();
+      return o1 || o2;
+    } else if ( operator == AND ) {
+      Boolean o1 = operands.next();
+      Boolean o2 = operands.next();
+      return o1 && o2;
+    } else {
+      return super.evaluate( operator, operands, evaluationContext );
+    }
+  }
+
+
+
+
+  public static void main( String[] args ) {
+    SimpleBooleanEvaluator evaluator = new SimpleBooleanEvaluator();
+    String expression = "true && false";
+    System.out.println( expression + " = " + evaluator.evaluate( expression ) );
+    expression = "true || false";
+    System.out.println( expression + " = " + evaluator.evaluate( expression ) );
+    expression = "!true";
+    System.out.println( expression + " = " + evaluator.evaluate( expression ) );
+  }
+}
