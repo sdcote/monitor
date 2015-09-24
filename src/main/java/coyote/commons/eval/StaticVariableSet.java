@@ -35,7 +35,8 @@ public class StaticVariableSet<T> implements AbstractVariableSet<T> {
    * 
    * @return The value of the variable.
    */
-  public T get( String variableName ) {
+  @Override
+  public T get( final String variableName ) {
     return this.varToValue.get( variableName );
   }
 
@@ -48,8 +49,8 @@ public class StaticVariableSet<T> implements AbstractVariableSet<T> {
    * @param variableName The variable name
    * @param value The variable value (null to remove a variable from the set).
    */
-  public void set( String variableName, T value ) {
+  public void set( final String variableName, final T value ) {
     this.varToValue.put( variableName, value );
   }
-  
+
 }

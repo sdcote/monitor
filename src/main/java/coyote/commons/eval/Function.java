@@ -4,22 +4,22 @@ package coyote.commons.eval;
  * A <a href="http://en.wikipedia.org/wiki/Function_(mathematics)">function</a>.
  */
 public class Function {
-  private String name;
-  private int minArgumentCount;
-  private int maxArgumentCount;
+  private final String name;
+  private final int minArgumentCount;
+  private final int maxArgumentCount;
 
 
 
 
   /**
-   * This constructor builds a function with a fixed arguments count.
+   * This constructor builds a function with a fixed argument count.
    * 
-   * @param name The function's name
-   * @param argumentCount The function's argument count.
+   * @param name The functions name
+   * @param argumentCount The functions argument count.
    * 
    * @throws IllegalArgumentException if argumentCount is lower than 0 or if the function name is null or empty.
    */
-  public Function( String name, int argumentCount ) {
+  public Function( final String name, final int argumentCount ) {
     this( name, argumentCount, argumentCount );
   }
 
@@ -27,21 +27,21 @@ public class Function {
 
 
   /**
-   * This constructor builds a function with a variable arguments count.
+   * This constructor builds a function with a variable argument count.
    * 
    * <p>For instance, a minimum function may have at least one argument.</p>
    * 
-   * @param name The function's name
-   * @param minArgumentCount The function's minimum argument count.
-   * @param maxArgumentCount The function's maximum argument count (Integer.MAX_VALUE to specify no upper limit).
+   * @param name The functions name
+   * @param minArgumentCount The functions minimum argument count.
+   * @param maxArgumentCount The functions maximum argument count (Integer.MAX_VALUE to specify no upper limit).
    * 
    * @throws IllegalArgumentException if minArgumentCount is less than 0 or greater than maxArgumentCount or if the function name is null or empty.
    */
-  public Function( String name, int minArgumentCount, int maxArgumentCount ) {
+  public Function( final String name, final int minArgumentCount, final int maxArgumentCount ) {
     if ( ( minArgumentCount < 0 ) || ( minArgumentCount > maxArgumentCount ) ) {
       throw new IllegalArgumentException( "Invalid argument count" );
     }
-    if ( name == null || name.length() == 0 ) {
+    if ( ( name == null ) || ( name.length() == 0 ) ) {
       throw new IllegalArgumentException( "Invalid function name" );
     }
     this.name = name;
@@ -53,36 +53,30 @@ public class Function {
 
 
   /**
-   * Gets the function's name.
-   * 
+   * @return the functions maximum argument count.
+   */
+  public int getMaximumArgumentCount() {
+    return maxArgumentCount;
+  }
+
+
+
+
+  /**
+   * @return the functions minimum argument count.
+   */
+  public int getMinimumArgumentCount() {
+    return minArgumentCount;
+  }
+
+
+
+
+  /**
    * @return the name of the function
    */
   public String getName() {
-    return this.name;
+    return name;
   }
 
-
-
-
-  /**
-   * Gets the function's minimum argument count.
-   * 
-   * @return an integer
-   */
-  public int getMinimumArgumentCount() {
-    return this.minArgumentCount;
-  }
-
-
-
-
-  /**
-   * Gets the function's maximum argument count.
-   * 
-   * @return an integer
-   */
-  public int getMaximumArgumentCount() {
-    return this.maxArgumentCount;
-  }
-  
 }

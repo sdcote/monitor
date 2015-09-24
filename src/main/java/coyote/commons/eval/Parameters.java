@@ -32,133 +32,13 @@ public class Parameters {
    * <p>Function argument separator is set to ','.</p>
    */
   public Parameters() {
-    this.operators = new ArrayList<Operator>();
-    this.functions = new ArrayList<Function>();
-    this.constants = new ArrayList<Constant>();
-    this.translations = new HashMap<String, String>();
-    this.expressionBrackets = new ArrayList<BracketPair>();
-    this.functionBrackets = new ArrayList<BracketPair>();
+    operators = new ArrayList<Operator>();
+    functions = new ArrayList<Function>();
+    constants = new ArrayList<Constant>();
+    translations = new HashMap<String, String>();
+    expressionBrackets = new ArrayList<BracketPair>();
+    functionBrackets = new ArrayList<BracketPair>();
     setFunctionArgumentSeparator( ',' );
-  }
-
-
-
-
-  /**
-   * Gets the supported operators.
-   * 
-   * @return a Collection of operators.
-   */
-  public Collection<Operator> getOperators() {
-    return this.operators;
-  }
-
-
-
-
-  /**
-   * Gets the supported functions.
-   *  
-   * @return a Collection of functions.
-   */
-  public Collection<Function> getFunctions() {
-    return this.functions;
-  }
-
-
-
-
-  /**
-   * Gets the supported constants.
-   * 
-   * @return a Collection of constants.
-   */
-  public Collection<Constant> getConstants() {
-    return this.constants;
-  }
-
-
-
-
-  /**
-   * Gets the supported bracket pairs for expressions.
-   * 
-   * @return a Collection of bracket pairs.
-   */
-  public Collection<BracketPair> getExpressionBrackets() {
-    return this.expressionBrackets;
-  }
-
-
-
-
-  /**
-   * Gets the supported bracket pairs for functions.
-   * 
-   * @return a Collection of bracket pairs.
-   */
-  public Collection<BracketPair> getFunctionBrackets() {
-    return this.functionBrackets;
-  }
-
-
-
-
-  /**
-   * Adds operators to the supported ones.
-   * 
-   * @param operators The operators to be added.
-   */
-  public void addOperators( Collection<Operator> operators ) {
-    this.operators.addAll( operators );
-  }
-
-
-
-
-  /**
-   * Adds an operator to the supported ones.
-   * 
-   * @param operator The added operator
-   */
-  public void add( Operator operator ) {
-    this.operators.add( operator );
-  }
-
-
-
-
-  /**
-   * Adds functions to the supported ones.
-   * 
-   * @param functions The functions to be added.
-   */
-  public void addFunctions( Collection<Function> functions ) {
-    this.functions.addAll( functions );
-  }
-
-
-
-
-  /**
-   * Adds a function to the supported ones.
-   * 
-   * @param function The added function
-   */
-  public void add( Function function ) {
-    this.functions.add( function );
-  }
-
-
-
-
-  /**
-   * Adds constants to the supported ones.
-   * 
-   * @param constants The constants to be added.
-   */
-  public void addConstants( Collection<Constant> constants ) {
-    this.constants.addAll( constants );
   }
 
 
@@ -169,8 +49,44 @@ public class Parameters {
    * 
    * @param constant The added constant
    */
-  public void add( Constant constant ) {
-    this.constants.add( constant );
+  public void add( final Constant constant ) {
+    constants.add( constant );
+  }
+
+
+
+
+  /**
+   * Adds a function to the supported ones.
+   * 
+   * @param function The added function
+   */
+  public void add( final Function function ) {
+    functions.add( function );
+  }
+
+
+
+
+  /**
+   * Adds an operator to the supported ones.
+   * 
+   * @param operator The added operator
+   */
+  public void add( final Operator operator ) {
+    operators.add( operator );
+  }
+
+
+
+
+  /**
+   * Adds constants to the supported ones.
+   * 
+   * @param constants The constants to be added.
+   */
+  public void addConstants( final Collection<Constant> constants ) {
+    this.constants.addAll( constants );
   }
 
 
@@ -181,8 +97,8 @@ public class Parameters {
    * 
    * @param pair A bracket pair
    */
-  public void addExpressionBracket( BracketPair pair ) {
-    this.expressionBrackets.add( pair );
+  public void addExpressionBracket( final BracketPair pair ) {
+    expressionBrackets.add( pair );
   }
 
 
@@ -193,8 +109,8 @@ public class Parameters {
    * 
    * @param brackets The brackets to be added.
    */
-  public void addExpressionBrackets( Collection<BracketPair> brackets ) {
-    this.expressionBrackets.addAll( brackets );
+  public void addExpressionBrackets( final Collection<BracketPair> brackets ) {
+    expressionBrackets.addAll( brackets );
   }
 
 
@@ -205,8 +121,8 @@ public class Parameters {
    * 
    * @param pair A bracket pair
    */
-  public void addFunctionBracket( BracketPair pair ) {
-    this.functionBrackets.add( pair );
+  public void addFunctionBracket( final BracketPair pair ) {
+    functionBrackets.add( pair );
   }
 
 
@@ -217,8 +133,127 @@ public class Parameters {
    * 
    * @param brackets The brackets to be added.
    */
-  public void addFunctionBrackets( Collection<BracketPair> brackets ) {
-    this.functionBrackets.addAll( brackets );
+  public void addFunctionBrackets( final Collection<BracketPair> brackets ) {
+    functionBrackets.addAll( brackets );
+  }
+
+
+
+
+  /**
+   * Adds functions to the supported ones.
+   * 
+   * @param functions The functions to be added.
+   */
+  public void addFunctions( final Collection<Function> functions ) {
+    this.functions.addAll( functions );
+  }
+
+
+
+
+  /**
+   * Adds operators to the supported ones.
+   * 
+   * @param operators The operators to be added.
+   */
+  public void addOperators( final Collection<Operator> operators ) {
+    this.operators.addAll( operators );
+  }
+
+
+
+
+  /**
+   * @return the supported constants.
+   */
+  public Collection<Constant> getConstants() {
+    return constants;
+  }
+
+
+
+
+  /**
+   * @return the supported bracket pairs for expressions.
+   */
+  public Collection<BracketPair> getExpressionBrackets() {
+    return expressionBrackets;
+  }
+
+
+
+
+  /**
+   * @return the function argument separator.
+   */
+  public String getFunctionArgumentSeparator() {
+    return functionSeparator;
+  }
+
+
+
+
+  /**
+   * @return the supported bracket pairs for functions.
+   */
+  public Collection<BracketPair> getFunctionBrackets() {
+    return functionBrackets;
+  }
+
+
+
+
+  /**
+   * @return the supported functions.
+   */
+  public Collection<Function> getFunctions() {
+    return functions;
+  }
+
+
+
+
+  /**
+   * @return the supported operators.
+   */
+  public Collection<Operator> getOperators() {
+    return operators;
+  }
+
+
+
+
+  String getTranslation( final String originalName ) {
+    final String translation = translations.get( originalName );
+    return translation == null ? originalName : translation;
+  }
+
+
+
+
+  /**
+   * Sets the function argument separator. (The default value is ',')</p>
+   * 
+   * @param separator The new separator
+   */
+  public void setFunctionArgumentSeparator( final char separator ) {
+    functionSeparator = new String( new char[] { separator } );
+  }
+
+
+
+
+  /**
+   * Sets the translated term for a constant.
+   * 
+   * @param constant The constant you want to translate the name
+   * @param translatedName The translated name
+   * 
+   * @see #setTranslation(Function, String)
+   */
+  public void setTranslation( final Constant constant, final String translatedName ) {
+    setTranslation( constant.getName(), translatedName );
   }
 
 
@@ -237,64 +272,15 @@ public class Parameters {
    * 
    * @see DoubleEvaluator#SUM
    */
-  public void setTranslation( Function function, String translatedName ) {
+  public void setTranslation( final Function function, final String translatedName ) {
     setTranslation( function.getName(), translatedName );
   }
 
 
 
 
-  /**
-   * Sets the translated term for a constant.
-   * 
-   * @param constant The constant you want to translate the name
-   * @param translatedName The translated name
-   * 
-   * @see #setTranslation(Function, String)
-   */
-  public void setTranslation( Constant constant, String translatedName ) {
-    setTranslation( constant.getName(), translatedName );
+  private void setTranslation( final String name, final String translatedName ) {
+    translations.put( name, translatedName );
   }
 
-
-
-
-  private void setTranslation( String name, String translatedName ) {
-    this.translations.put( name, translatedName );
-  }
-
-
-
-
-  String getTranslation( String originalName ) {
-    String translation = this.translations.get( originalName );
-    return translation == null ? originalName : translation;
-  }
-
-
-
-
-  /**
-   * Sets the function argument separator.
-   * 
-   * <p>Its default value is ','.</p>
-   * 
-   * @param separator The new separator
-   */
-  public void setFunctionArgumentSeparator( char separator ) {
-    this.functionSeparator = new String( new char[] { separator } );
-  }
-
-
-
-
-  /**
-   * Gets the function argument separator.
-   * 
-   * @return a string
-   */
-  public String getFunctionArgumentSeparator() {
-    return this.functionSeparator;
-  }
-  
 }

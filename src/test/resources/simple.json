@@ -17,6 +17,6 @@
 		}
 	],
 
-	"Logger" : { "Class": "ConsoleAppender", "Categories": "TRACE,DEBUG,INFO,LOADER,THREAD,SCHEDULER" },
+	"Logger" : { "Class": "ConsoleAppender", "Categories": "TRACE,DEBUG,INFO,LOADER,THREAD,SCHEDULER,HTTP" },
 	"Logger" : { "Class": "SysErrAppender", "Categories": "WARN,ERROR,FATAL" }
 }

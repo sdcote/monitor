@@ -39,7 +39,7 @@ public abstract class AbstractEvaluator<T> {
    * <br>Please note that there's no side effect between the evaluator and the parameters.
    * So, changes made to the parameters after the call to this constructor are ignored by the instance. 
    */
-  protected AbstractEvaluator( Parameters parameters ) {
+  protected AbstractEvaluator( final Parameters parameters ) {
     //TODO if constants, operators, functions are duplicated => error
     final ArrayList<String> tokenDelimitersBuilder = new ArrayList<String>();
     functions = new HashMap<String, Function>();
@@ -60,7 +60,7 @@ public abstract class AbstractEvaluator<T> {
       tokenDelimitersBuilder.add( pair.getClose() );
     }
     if ( operators != null ) {
-      for ( Operator ope : parameters.getOperators() ) {
+      for ( final Operator ope : parameters.getOperators() ) {
         tokenDelimitersBuilder.add( ope.getSymbol() );
         List<Operator> known = this.operators.get( ope.getSymbol() );
         if ( known == null ) {
@@ -75,7 +75,7 @@ public abstract class AbstractEvaluator<T> {
     }
     boolean needFunctionSeparator = false;
     if ( parameters.getFunctions() != null ) {
-      for ( Function function : parameters.getFunctions() ) {
+      for ( final Function function : parameters.getFunctions() ) {
         this.functions.put( parameters.getTranslation( function.getName() ), function );
         if ( function.getMaximumArgumentCount() > 1 ) {
           needFunctionSeparator = true;
@@ -83,7 +83,7 @@ public abstract class AbstractEvaluator<T> {
       }
     }
     if ( parameters.getConstants() != null ) {
-      for ( Constant constant : parameters.getConstants() ) {
+      for ( final Constant constant : parameters.getConstants() ) {
         this.constants.put( parameters.getTranslation( constant.getName() ), constant );
       }
     }
@@ -97,117 +97,8 @@ public abstract class AbstractEvaluator<T> {
 
 
 
-  /** Validates that homonym operators are valid.
-   * <br>Homonym operators are operators with the same name (like the unary - and the binary - operators)
-   * <br>This method is called when homonyms are passed to the constructor.
-   * <br>This default implementation only allows the case where there's two operators, one binary and one unary.
-   * Subclasses can override this method in order to accept others configurations. 
-   * @param operators The operators to validate.
-   * @throws IllegalArgumentException if the homonyms are not compatibles.
-   * @see #guessOperator(Token, List)
-   */
-  protected void validateHomonyms( List<Operator> operators ) {
-    if ( operators.size() > 2 ) {
-      throw new IllegalArgumentException();
-    }
-  }
-
-
-
-
-  /** When a token can be more than one operator (homonym operators), this method guesses the right operator.
-   * <br>A very common case is the - sign in arithmetic computation which can be an unary or a binary operator, depending
-   * on what was the previous token. 
-   * <br><b>Warning:</b> maybe the arguments of this function are not enough to deal with all the cases.
-   * So, this part of the evaluation is in alpha state (method may change in the future).
-   * @param previous The last parsed tokens (the previous token in the infix expression we are evaluating). 
-   * @param candidates The candidate tokens.
-   * @return A token
-   * @see #validateHomonyms(List)
-   */
-  protected Operator guessOperator( Token previous, List<Operator> candidates ) {
-    final int argCount = ( ( previous != null ) && ( previous.isCloseBracket() || previous.isLiteral() ) ) ? 2 : 1;
-    for ( Operator operator : candidates ) {
-      if ( operator.getOperandCount() == argCount ) {
-        return operator;
-      }
-    }
-    return null;
-  }
-
-
-
-
-  @SuppressWarnings("unchecked")
-  private void output( Deque<T> values, Token token, Object evaluationContext ) {
-    if ( token.isLiteral() ) { // If the token is a literal, a constant, or a variable name
-      String literal = token.getLiteral();
-      Constant ct = this.constants.get( literal );
-      T value = ct == null ? null : evaluate( ct, evaluationContext );
-      if ( value == null && evaluationContext != null && ( evaluationContext instanceof AbstractVariableSet ) ) {
-        value = ( (AbstractVariableSet<T>)evaluationContext ).get( literal );
-      }
-      values.push( value != null ? value : toValue( literal, evaluationContext ) );
-    } else if ( token.isOperator() ) {
-      Operator operator = token.getOperator();
-      values.push( evaluate( operator, getArguments( values, operator.getOperandCount() ), evaluationContext ) );
-    } else {
-      throw new IllegalArgumentException();
-    }
-  }
-
-
-
-
-  /** Evaluates a constant.
-   * <br>Subclasses that support constants must override this method.
-   * The default implementation throws a RuntimeException meaning that implementor forget to implement this method
-   * while creating a subclass that accepts constants.
-   * @param constant The constant
-   * @param evaluationContext The context of the evaluation
-   * @return The constant's value
-   */
-  protected T evaluate( Constant constant, Object evaluationContext ) {
-    throw new RuntimeException( "evaluate(Constant) is not implemented for " + constant.getName() );
-  }
-
-
-
-
-  /** Evaluates an operation.
-   * <br>Subclasses that support operators must override this method.
-   * The default implementation throws a RuntimeException meaning that implementor forget to implement this method
-   * while creating a subclass that accepts operators.
-   * @param operator The operator
-   * @param operands The operands
-   * @param evaluationContext The context of the evaluation
-   * @return The result of the operation
-   */
-  protected T evaluate( Operator operator, Iterator<T> operands, Object evaluationContext ) {
-    throw new RuntimeException( "evaluate(Operator, Iterator) is not implemented for " + operator.getSymbol() );
-  }
-
-
-
-
-  /** Evaluates a function.
-   * <br>Subclasses that support functions must override this method.
-   * The default implementation throws a RuntimeException meaning that implementor forget to implement this method
-   * while creating a subclass that accepts functions.
-   * @param function The function
-   * @param arguments The function's arguments
-   * @param evaluationContext The context of the evaluation
-   * @return The result of the function
-   */
-  protected T evaluate( Function function, Iterator<T> arguments, Object evaluationContext ) {
-    throw new RuntimeException( "evaluate(Function, Iterator) is not implemented for " + function.getName() );
-  }
-
-
-
-
-  private void doFunction( Deque<T> values, Function function, int argCount, Object evaluationContext ) {
-    if ( function.getMinimumArgumentCount() > argCount || function.getMaximumArgumentCount() < argCount ) {
+  private void doFunction( final Deque<T> values, final Function function, final int argCount, final Object evaluationContext ) {
+    if ( ( function.getMinimumArgumentCount() > argCount ) || ( function.getMaximumArgumentCount() < argCount ) ) {
       throw new IllegalArgumentException( "Invalid argument count for " + function.getName() );
     }
     values.push( evaluate( function, getArguments( values, argCount ), evaluationContext ) );
@@ -216,56 +107,104 @@ public abstract class AbstractEvaluator<T> {
 
 
 
-  private Iterator<T> getArguments( Deque<T> values, int nb ) {
-    // Be aware that arguments are in reverse order on the values stack.
-    // Don't forget to reorder them in the original order (the one they appear in the evaluated formula)
-    if ( values.size() < nb ) {
-      throw new IllegalArgumentException();
-    }
-    LinkedList<T> result = new LinkedList<T>();
-    for ( int i = 0; i < nb; i++ ) {
-      result.addFirst( values.pop() );
-    }
-    return result.iterator();
+  /** 
+   * Evaluates a constant.
+   * 
+   * <p>Subclasses that support constants must override this method. The 
+   * default implementation throws a RuntimeException meaning that implementor 
+   * forget to implement this method while creating a subclass that accepts 
+   * constants.</p>
+   * 
+   * @param constant The constant
+   * @param evaluationContext The context of the evaluation
+   * 
+   * @return The constant's value
+   */
+  protected T evaluate( final Constant constant, final Object evaluationContext ) {
+    throw new RuntimeException( "evaluate(Constant) is not implemented for " + constant.getName() );
   }
 
 
 
 
-  /** Evaluates a literal (Converts it to a value).
-   * @param literal The literal to evaluate.
-   * @return an instance of T.
+  /**
+   * Evaluates a function.
+   * 
+   * <p>Subclasses that support functions must override this method. The 
+   * default implementation throws a RuntimeException meaning that implementor 
+   * forget to implement this method while creating a subclass that accepts 
+   * functions.</p>
+   * 
+   * @param function The function
+   * @param arguments The function's arguments
    * @param evaluationContext The context of the evaluation
-   * @throws IllegalArgumentException if the literal can't be converted to a value.
+   * 
+   * @return The result of the function
    */
-  protected abstract T toValue( String literal, Object evaluationContext );
+  protected T evaluate( final Function function, final Iterator<T> arguments, final Object evaluationContext ) {
+    throw new RuntimeException( "evaluate(Function, Iterator) is not implemented for " + function.getName() );
+  }
 
 
 
 
-  /** Evaluates an expression.
+  /**
+   * Evaluates an operation.
+   * <p>Subclasses that support operators must override this method. The 
+   * default implementation throws a RuntimeException meaning that implementor 
+   * forget to implement this method while creating a subclass that accepts 
+   * operators.</p>
+   * 
+   * @param operator The operator
+   * @param operands The operands
+   * @param evaluationContext The context of the evaluation
+   * 
+   * @return The result of the operation
+   */
+  protected T evaluate( final Operator operator, final Iterator<T> operands, final Object evaluationContext ) {
+    throw new RuntimeException( "evaluate(Operator, Iterator) is not implemented for " + operator.getSymbol() );
+  }
+
+
+
+
+  /**
+   * Evaluates an expression.
+   * 
    * @param expression The expression to evaluate.
+   * 
    * @return the result of the evaluation.
+   * 
    * @throws IllegalArgumentException if the expression is not correct.
    */
-  public T evaluate( String expression ) {
+  public T evaluate( final String expression ) {
     return evaluate( expression, null );
   }
 
 
 
 
-  /** Evaluates an expression that contains variables.
+  /**
+   * Evaluates an expression that contains variables.
+   * 
+   * <p>The context is an object that can contain useful dynamic data, for 
+   * example the values of the variables used in the expression (Use an 
+   * AbstractVariableSet to do that).</p>
+   * 
+   * <p>The context is not limited to variable values but can be used for any 
+   * dynamic information.</p>
+
+   * 
    * @param expression The expression to evaluate.
    * @param evaluationContext The context of the evaluation.
-   * <br>This context is an object that can contain useful dynamic data, for example the values of the variables
-   * used in the expression (Use an AbstractVariableSet to do that).<br>The context is not limited to variable values but
-   * can be used for any dynamic information. A good example is the <a href="http://javaluator.sourceforge.net/en/doc/tutorial.php?chapter=creatingComplex">BooleanSetEvaluator</a> one.
+   * 
    * @return the result of the evaluation.
+   * 
    * @throws IllegalArgumentException if the expression is not correct.
+   * 
    * @see AbstractVariableSet
    */
-  public T evaluate( String expression, Object evaluationContext ) {
+  public T evaluate( final String expression, final Object evaluationContext ) {
     final Deque<T> values = new ArrayDeque<T>(); // values stack
     final Deque<Token> stack = new ArrayDeque<Token>(); // operator stack
     final Deque<Integer> previousValuesSize = functions.isEmpty() ? null : new ArrayDeque<Integer>();
@@ -273,12 +212,12 @@ public abstract class AbstractEvaluator<T> {
     Token previous = null;
     while ( tokens.hasNext() ) {
       // read one token from the input stream
-      String strToken = tokens.next();
+      final String strToken = tokens.next();
       final Token token = toToken( previous, strToken );
       if ( token.isOpenBracket() ) {
         // If the token is a left parenthesis, then push it onto the stack.
         stack.push( token );
-        if ( previous != null && previous.isFunction() ) {
+        if ( ( previous != null ) && previous.isFunction() ) {
           if ( !functionBrackets.containsKey( token.getBrackets().getOpen() ) ) {
             throw new IllegalArgumentException( "Invalid bracket after function: " + strToken );
           }
@@ -294,13 +233,13 @@ public abstract class AbstractEvaluator<T> {
         if ( previous.isFunctionArgumentSeparator() ) {
           throw new IllegalArgumentException( "argument is missing" );
         }
-        BracketPair brackets = token.getBrackets();
+        final BracketPair brackets = token.getBrackets();
         // If the token is a right parenthesis:
         boolean openBracketFound = false;
         // Until the token at the top of the stack is a left parenthesis,
         // pop operators off the stack onto the output queue
         while ( !stack.isEmpty() ) {
-          Token sc = stack.pop();
+          final Token sc = stack.pop();
           if ( sc.isOpenBracket() ) {
             if ( sc.getBrackets().equals( brackets ) ) {
               openBracketFound = true;
@@ -320,8 +259,8 @@ public abstract class AbstractEvaluator<T> {
         if ( !stack.isEmpty() && stack.peek().isFunction() ) {
           // If the token at the top of the stack is a function token, pop it
           // onto the output queue.
-          int argCount = values.size() - previousValuesSize.pop();
-          doFunction( values, (Function)stack.pop().getFunction(), argCount, evaluationContext );
+          final int argCount = values.size() - previousValuesSize.pop();
+          doFunction( values, stack.pop().getFunction(), argCount, evaluationContext );
         }
       } else if ( token.isFunctionArgumentSeparator() ) {
         if ( previous == null ) {
@@ -356,7 +295,7 @@ public abstract class AbstractEvaluator<T> {
       } else if ( token.isOperator() ) {
         // If the token is an operator, op1, then:
         while ( !stack.isEmpty() ) {
-          Token sc = stack.peek();
+          final Token sc = stack.peek();
           // While there is an operator token, o2, at the top of the stack
           // op1 is left-associative and its precedence is less than or equal
           // to that of op2,
@@ -386,7 +325,7 @@ public abstract class AbstractEvaluator<T> {
     // When there are no more tokens to read:
     // While there are still operator tokens in the stack:
     while ( !stack.isEmpty() ) {
-      Token sc = stack.pop();
+      final Token sc = stack.pop();
       if ( sc.isOpenBracket() || sc.isCloseBracket() ) {
         throw new IllegalArgumentException( "Parentheses mismatched" );
       }
@@ -401,13 +340,150 @@ public abstract class AbstractEvaluator<T> {
 
 
 
-  private Token toToken( Token previous, String token ) {
+  private Iterator<T> getArguments( final Deque<T> values, final int nb ) {
+    // Be aware that arguments are in reverse order on the values stack.
+    // Don't forget to reorder them in the original order (the one they appear in the evaluated formula)
+    if ( values.size() < nb ) {
+      throw new IllegalArgumentException();
+    }
+    final LinkedList<T> result = new LinkedList<T>();
+    for ( int i = 0; i < nb; i++ ) {
+      result.addFirst( values.pop() );
+    }
+    return result.iterator();
+  }
+
+
+
+
+  private BracketPair getBracketPair( final String token ) {
+    final BracketPair result = expressionBrackets.get( token );
+    return result == null ? functionBrackets.get( token ) : result;
+  }
+
+
+
+
+  /** 
+   * Gets the constants supported by this evaluator.
+   * 
+   * @return a collection of constants.
+   */
+  public Collection<Constant> getConstants() {
+    return this.constants.values();
+  }
+
+
+
+
+  /** 
+   * Gets the functions supported by this evaluator.
+   * 
+   * @return a collection of functions.
+   */
+  public Collection<Function> getFunctions() {
+    return this.functions.values();
+  }
+
+
+
+
+  /** 
+   * Gets the operators supported by this evaluator.
+   * 
+   * @return a collection of operators.
+   */
+  public Collection<Operator> getOperators() {
+    final ArrayList<Operator> result = new ArrayList<Operator>();
+    final Collection<List<Operator>> values = this.operators.values();
+    for ( final List<Operator> list : values ) {
+      result.addAll( list );
+    }
+    return result;
+  }
+
+
+
+
+  /** 
+   * When a token can be more than one operator (homonym operators), this 
+   * method guesses the right operator.
+   * 
+   * <p>A very common case is the - sign in arithmetic computation which can be 
+   * an unary or a binary operator, depending on what was the previous token.</p>
+   *  
+   * <p><b>Warning:</b> maybe the arguments of this function are not enough to 
+   * deal with all the cases. So, this part of the evaluation is in alpha state 
+   * (method may change in the future).</p>
+   * 
+   * @param previous The last parsed tokens (the previous token in the infix expression we are evaluating). 
+   * @param candidates The candidate tokens.
+   * 
+   * @return A token
+   * 
+   * @see #validateHomonyms(List)
+   */
+  protected Operator guessOperator( final Token previous, final List<Operator> candidates ) {
+    final int argCount = ( ( previous != null ) && ( previous.isCloseBracket() || previous.isLiteral() ) ) ? 2 : 1;
+    for ( final Operator operator : candidates ) {
+      if ( operator.getOperandCount() == argCount ) {
+        return operator;
+      }
+    }
+    return null;
+  }
+
+
+
+
+  @SuppressWarnings("unchecked")
+  private void output( final Deque<T> values, final Token token, final Object evaluationContext ) {
+    if ( token.isLiteral() ) { // If the token is a literal, a constant, or a variable name
+      final String literal = token.getLiteral();
+      final Constant ct = this.constants.get( literal );
+      T value = ct == null ? null : evaluate( ct, evaluationContext );
+      if ( ( value == null ) && ( evaluationContext != null ) && ( evaluationContext instanceof AbstractVariableSet ) ) {
+        value = ( (AbstractVariableSet<T>)evaluationContext ).get( literal );
+      }
+      values.push( value != null ? value : toValue( literal, evaluationContext ) );
+    } else if ( token.isOperator() ) {
+      final Operator operator = token.getOperator();
+      values.push( evaluate( operator, getArguments( values, operator.getOperandCount() ), evaluationContext ) );
+    } else {
+      throw new IllegalArgumentException();
+    }
+  }
+
+
+
+
+  /**
+   * Converts the evaluated expression into tokens.
+   * 
+   * <p>Example: The result for the expression "<i>-1+min(10,3)</i>" is an 
+   * iterator on "-", "1", "+", "min", "(", "10", ",", "3", ")".</p>
+   * 
+   * <p>By default, the operators symbols, the brackets and the function 
+   * argument separator are used as delimiter in the string.</p>
+   * 
+   * @param expression The expression that is evaluated
+   * 
+   * @return A string iterator.
+   */
+  protected Iterator<String> tokenize( final String expression ) {
+    return tokenizer.tokenize( expression );
+  }
+
+
+
+
+  private Token toToken( final Token previous, final String token ) {
     if ( token.equals( functionArgumentSeparator ) ) {
       return Token.FUNCTION_ARG_SEPARATOR;
     } else if ( functions.containsKey( token ) ) {
       return Token.buildFunction( functions.get( token ) );
     } else if ( operators.containsKey( token ) ) {
-      List<Operator> list = operators.get( token );
+      final List<Operator> list = operators.get( token );
       return ( list.size() == 1 ) ? Token.buildOperator( list.get( 0 ) ) : Token.buildOperator( guessOperator( previous, list ) );
     } else {
       final BracketPair brackets = getBracketPair( token );
@@ -426,56 +502,42 @@ public abstract class AbstractEvaluator<T> {
 
 
 
-  private BracketPair getBracketPair( String token ) {
-    BracketPair result = expressionBrackets.get( token );
-    return result == null ? functionBrackets.get( token ) : result;
-  }
-
-
-
-
-  /** Gets the operators supported by this evaluator.
-   * @return a collection of operators.
+  /**
+   * Evaluates a literal (Converts it to a value).
+   * 
+   * @param literal The literal to evaluate.
+   * @param evaluationContext The context of the evaluation
+   * 
+   * @return an instance of T.
+   * 
+   * @throws IllegalArgumentException if the literal can't be converted to a value.
    */
-  public Collection<Operator> getOperators() {
-    ArrayList<Operator> result = new ArrayList<Operator>();
-    Collection<List<Operator>> values = this.operators.values();
-    for ( List<Operator> list : values ) {
-      result.addAll( list );
+  protected abstract T toValue( String literal, Object evaluationContext );
+
+
+
+
+  /**
+   * Validates that homonym operators are valid.
+   * 
+   * <p>Homonym operators are operators with the same name (like the unary - 
+   * and the binary - operators)</p>
+   * 
+   * <p>This method is called when homonyms are passed to the constructor.</p>
+   * 
+   * <p>This default implementation only allows the case where there's two 
+   * operators, one binary and one unary. Subclasses can override this method 
+   * in order to accept others configurations.</p>
+   *  
+   * @param operators The operators to validate.
+   * 
+   * @throws IllegalArgumentException if the homonyms are not compatibles.
+   * 
+   * @see #guessOperator(Token, List)
+   */
+  protected void validateHomonyms( final List<Operator> operators ) {
+    if ( operators.size() > 2 ) {
+      throw new IllegalArgumentException();
     }
-    return result;
-  }
-
-
-
-
-  /** Gets the functions supported by this evaluator.
-   * @return a collection of functions.
-   */
-  public Collection<Function> getFunctions() {
-    return this.functions.values();
-  }
-
-
-
-
-  /** Gets the constants supported by this evaluator.
-   * @return a collection of constants.
-   */
-  public Collection<Constant> getConstants() {
-    return this.constants.values();
-  }
-
-
-
-
-  /** Converts the evaluated expression into tokens.
-   * <br>Example: The result for the expression "<i>-1+min(10,3)</i>" is an iterator on "-", "1", "+", "min", "(", "10", ",", "3", ")".
-   * <br>By default, the operators symbols, the brackets and the function argument separator are used as delimiter in the string.
-   * @param expression The expression that is evaluated
-   * @return A string iterator.
-   */
-  protected Iterator<String> tokenize( String expression ) {
-    return tokenizer.tokenize( expression );
   }
 }

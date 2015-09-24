@@ -16,19 +16,17 @@ package coyote.commons.eval;
  * @see AbstractEvaluator#evaluate(Constant, Object)
  */
 public class Constant {
-  private String name;
+  private final String name;
 
 
 
 
   /**
-   * Constructor
+   * Constructor specifying the name used in expressions to identify the constants. 
    * 
    * @param name The mnemonic of the constant.
-   * 
-   * <p>The name is used in expressions to identified the constants.</p>
    */
-  public Constant( String name ) {
+  public Constant( final String name ) {
     this.name = name;
   }
 
@@ -43,5 +41,5 @@ public class Constant {
   public String getName() {
     return name;
   }
-  
+
 }

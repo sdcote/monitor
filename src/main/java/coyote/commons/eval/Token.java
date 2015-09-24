@@ -13,48 +13,49 @@ public class Token {
 
   static final Token FUNCTION_ARG_SEPARATOR = new Token( Kind.FUNCTION_SEPARATOR, null );
 
-  private Kind kind;
-  private Object content;
 
 
 
-
-  static Token buildLiteral( String literal ) {
-    return new Token( Kind.LITERAL, literal );
-  }
-
-
-
-
-  static Token buildOperator( Operator ope ) {
-    return new Token( Kind.OPERATOR, ope );
-  }
-
-
-
-
-  static Token buildFunction( Function function ) {
-    return new Token( Kind.FUNCTION, function );
-  }
-
-
-
-
-  static Token buildOpenToken( BracketPair pair ) {
-    return new Token( Kind.OPEN_BRACKET, pair );
-  }
-
-
-
-
-  static Token buildCloseToken( BracketPair pair ) {
+  static Token buildCloseToken( final BracketPair pair ) {
     return new Token( Kind.CLOSE_BRACKET, pair );
   }
 
 
 
 
-  private Token( Kind kind, Object content ) {
+  static Token buildFunction( final Function function ) {
+    return new Token( Kind.FUNCTION, function );
+  }
+
+
+
+
+  static Token buildLiteral( final String literal ) {
+    return new Token( Kind.LITERAL, literal );
+  }
+
+
+
+
+  static Token buildOpenToken( final BracketPair pair ) {
+    return new Token( Kind.OPEN_BRACKET, pair );
+  }
+
+
+
+
+  static Token buildOperator( final Operator ope ) {
+    return new Token( Kind.OPERATOR, ope );
+  }
+
+  private final Kind kind;
+
+  private final Object content;
+
+
+
+
+  private Token( final Kind kind, final Object content ) {
     super();
     if ( ( kind.equals( Kind.OPERATOR ) && !( content instanceof Operator ) ) || ( kind.equals( Kind.FUNCTION ) && !( content instanceof Function ) ) || ( kind.equals( Kind.LITERAL ) && !( content instanceof String ) ) ) {
       throw new IllegalArgumentException();
@@ -66,22 +67,22 @@ public class Token {
 
 
 
-  BracketPair getBrackets() {
-    return (BracketPair)this.content;
+  Operator.Associativity getAssociativity() {
+    return getOperator().getAssociativity();
   }
 
 
 
 
-  Operator getOperator() {
-    return (Operator)this.content;
+  BracketPair getBrackets() {
+    return (BracketPair)content;
   }
 
 
 
 
   Function getFunction() {
-    return (Function)this.content;
+    return (Function)content;
   }
 
 
@@ -94,37 +95,25 @@ public class Token {
 
 
 
-  /**
-   * Tests whether the token is an operator.
-   * 
-   * @return true if the token is an operator
-   */
-  public boolean isOperator() {
-    return kind.equals( Kind.OPERATOR );
+  String getLiteral() {
+    if ( !kind.equals( Kind.LITERAL ) ) {
+      throw new IllegalArgumentException();
+    }
+    return (String)content;
   }
 
 
 
 
-  /**
-   * Tests whether the token is a function.
-   * 
-   * @return true if the token is a function
-   */
-  public boolean isFunction() {
-    return kind.equals( Kind.FUNCTION );
+  Operator getOperator() {
+    return (Operator)content;
   }
 
 
 
 
-  /**
-   * Tests whether the token is an open bracket.
-   * 
-   * @return true if the token is an open bracket
-   */
-  public boolean isOpenBracket() {
-    return kind.equals( Kind.OPEN_BRACKET );
+  int getPrecedence() {
+    return getOperator().getPrecedence();
   }
 
 
@@ -137,6 +126,18 @@ public class Token {
    */
   public boolean isCloseBracket() {
     return kind.equals( Kind.CLOSE_BRACKET );
+  }
+
+
+
+
+  /**
+   * Tests whether the token is a function.
+   * 
+   * @return true if the token is a function
+   */
+  public boolean isFunction() {
+    return kind.equals( Kind.FUNCTION );
   }
 
 
@@ -166,25 +167,25 @@ public class Token {
 
 
 
-  Operator.Associativity getAssociativity() {
-    return getOperator().getAssociativity();
+  /**
+   * Tests whether the token is an open bracket.
+   * 
+   * @return true if the token is an open bracket
+   */
+  public boolean isOpenBracket() {
+    return kind.equals( Kind.OPEN_BRACKET );
   }
 
 
 
 
-  int getPrecedence() {
-    return getOperator().getPrecedence();
+  /**
+   * Tests whether the token is an operator.
+   * 
+   * @return true if the token is an operator
+   */
+  public boolean isOperator() {
+    return kind.equals( Kind.OPERATOR );
   }
 
-
-
-
-  String getLiteral() {
-    if ( !this.kind.equals( Kind.LITERAL ) ) {
-      throw new IllegalArgumentException();
-    }
-    return (String)this.content;
-  }
-  
 }

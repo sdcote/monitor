@@ -1,14 +1,20 @@
 package coyote.commons.eval;
 
-/** An abstract variable set.
+/**
+ * An abstract variable set.
  * 
- * <br>The eval library supports expression that contains variables (for example <i>sin(x)</i>).
- * <br>An AbstractVariableSet converts, during the expression evaluation, each variable to its value.
+ * <p>The eval library supports expression that contains variables (for example 
+ * <i>sin(x)</i>).</p>
+ * 
+ * <p>An AbstractVariableSet converts, during the expression evaluation, each 
+ * variable to its value.</p>
+ * 
  * @param <T> The type of the values of the variable (the one handled by the evaluator).
  */
 public interface AbstractVariableSet<T> {
 
-  /** Gets the value of a variable.
+  /** 
+   * Gets the value of a variable.
    * 
    * @param variableName The name of a variable
    * 

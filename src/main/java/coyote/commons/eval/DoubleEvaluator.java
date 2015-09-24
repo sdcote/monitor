@@ -177,8 +177,8 @@ public class DoubleEvaluator extends AbstractEvaluator<Double> {
    *  
    * @return a Paramaters instance
    */
-  public static Parameters getDefaultParameters( Style style ) {
-    Parameters result = new Parameters();
+  public static Parameters getDefaultParameters( final Style style ) {
+    final Parameters result = new Parameters();
     result.addOperators( style == Style.STANDARD ? Arrays.asList( OPERATORS ) : Arrays.asList( OPERATORS_EXCEL ) );
     result.addFunctions( Arrays.asList( FUNCTIONS ) );
     result.addConstants( Arrays.asList( CONSTANTS ) );
@@ -217,21 +217,17 @@ public class DoubleEvaluator extends AbstractEvaluator<Double> {
    * 
    * @param parameters The parameters of the evaluator.
    */
-  public DoubleEvaluator( Parameters parameters ) {
+  public DoubleEvaluator( final Parameters parameters ) {
     super( parameters );
   }
 
 
 
 
-  @Override
-  protected Double toValue( String literal, Object evaluationContext ) {
-    ParsePosition p = new ParsePosition( 0 );
-    Number result = FORMATTER.get().parse( literal, p );
-    if ( p.getIndex() == 0 || p.getIndex() != literal.length() ) {
-      throw new IllegalArgumentException( literal + " is not a number" );
+  private void errIfNaN( final Double result, final Function function ) {
+    if ( result.equals( Double.NaN ) ) {
+      throw new IllegalArgumentException( "Invalid argument passed to " + function.getName() );
     }
-    return result.doubleValue();
   }
 
 
@@ -241,7 +237,7 @@ public class DoubleEvaluator extends AbstractEvaluator<Double> {
    * @see coyote.commons.eval.AbstractEvaluator#evaluate(coyote.commons.eval.Constant, java.lang.Object)
    */
   @Override
-  protected Double evaluate( Constant constant, Object evaluationContext ) {
+  protected Double evaluate( final Constant constant, final Object evaluationContext ) {
     if ( PI.equals( constant ) ) {
       return Math.PI;
     } else if ( E.equals( constant ) ) {
@@ -255,37 +251,10 @@ public class DoubleEvaluator extends AbstractEvaluator<Double> {
 
 
   /**
-   * @see coyote.commons.eval.AbstractEvaluator#evaluate(coyote.commons.eval.Operator, java.util.Iterator, java.lang.Object)
-   */
-  @Override
-  protected Double evaluate( Operator operator, Iterator<Double> operands, Object evaluationContext ) {
-    if ( NEGATE.equals( operator ) || NEGATE_HIGH.equals( operator ) ) {
-      return -operands.next();
-    } else if ( MINUS.equals( operator ) ) {
-      return operands.next() - operands.next();
-    } else if ( PLUS.equals( operator ) ) {
-      return operands.next() + operands.next();
-    } else if ( MULTIPLY.equals( operator ) ) {
-      return operands.next() * operands.next();
-    } else if ( DIVIDE.equals( operator ) ) {
-      return operands.next() / operands.next();
-    } else if ( EXPONENT.equals( operator ) ) {
-      return Math.pow( operands.next(), operands.next() );
-    } else if ( MODULO.equals( operator ) ) {
-      return operands.next() % operands.next();
-    } else {
-      return super.evaluate( operator, operands, evaluationContext );
-    }
-  }
-
-
-
-
-  /**
    * @see coyote.commons.eval.AbstractEvaluator#evaluate(coyote.commons.eval.Function, java.util.Iterator, java.lang.Object)
    */
   @Override
-  protected Double evaluate( Function function, Iterator<Double> arguments, Object evaluationContext ) {
+  protected Double evaluate( final Function function, final Iterator<Double> arguments, final Object evaluationContext ) {
     Double result;
     if ( ABS.equals( function ) ) {
       result = Math.abs( arguments.next() );
@@ -294,8 +263,8 @@ public class DoubleEvaluator extends AbstractEvaluator<Double> {
     } else if ( FLOOR.equals( function ) ) {
       result = Math.floor( arguments.next() );
     } else if ( ROUND.equals( function ) ) {
-      Double arg = arguments.next();
-      if ( arg == Double.NEGATIVE_INFINITY || arg == Double.POSITIVE_INFINITY ) {
+      final Double arg = arguments.next();
+      if ( ( arg == Double.NEGATIVE_INFINITY ) || ( arg == Double.POSITIVE_INFINITY ) ) {
         result = arg;
       } else {
         result = (double)Math.round( arg );
@@ -357,10 +326,41 @@ public class DoubleEvaluator extends AbstractEvaluator<Double> {
 
 
 
-  private void errIfNaN( Double result, Function function ) {
-    if ( result.equals( Double.NaN ) ) {
-      throw new IllegalArgumentException( "Invalid argument passed to " + function.getName() );
+  /**
+   * @see coyote.commons.eval.AbstractEvaluator#evaluate(coyote.commons.eval.Operator, java.util.Iterator, java.lang.Object)
+   */
+  @Override
+  protected Double evaluate( final Operator operator, final Iterator<Double> operands, final Object evaluationContext ) {
+    if ( NEGATE.equals( operator ) || NEGATE_HIGH.equals( operator ) ) {
+      return -operands.next();
+    } else if ( MINUS.equals( operator ) ) {
+      return operands.next() - operands.next();
+    } else if ( PLUS.equals( operator ) ) {
+      return operands.next() + operands.next();
+    } else if ( MULTIPLY.equals( operator ) ) {
+      return operands.next() * operands.next();
+    } else if ( DIVIDE.equals( operator ) ) {
+      return operands.next() / operands.next();
+    } else if ( EXPONENT.equals( operator ) ) {
+      return Math.pow( operands.next(), operands.next() );
+    } else if ( MODULO.equals( operator ) ) {
+      return operands.next() % operands.next();
+    } else {
+      return super.evaluate( operator, operands, evaluationContext );
     }
   }
-  
+
+
+
+
+  @Override
+  protected Double toValue( final String literal, final Object evaluationContext ) {
+    final ParsePosition p = new ParsePosition( 0 );
+    final Number result = FORMATTER.get().parse( literal, p );
+    if ( ( p.getIndex() == 0 ) || ( p.getIndex() != literal.length() ) ) {
+      throw new IllegalArgumentException( literal + " is not a number" );
+    }
+    return result.doubleValue();
+  }
+
 }
