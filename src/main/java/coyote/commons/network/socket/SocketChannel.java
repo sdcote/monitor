@@ -23,12 +23,15 @@ import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.Hashtable;
 
+import javax.net.ssl.SSLSocket;
+
 import coyote.commons.ClassLoaderUtil;
 import coyote.commons.ExceptionUtil;
 import coyote.commons.StreamUtil;
 import coyote.commons.UriUtil;
 import coyote.commons.network.IChannel;
 import coyote.commons.network.IChannelHandler;
+import coyote.commons.network.socket.ssl.SSLWorker;
 import coyote.loader.log.Log;
 
 
@@ -75,6 +78,9 @@ public final class SocketChannel implements Runnable, IChannel {
   /** The optional IChannelHandler that we are to run to service this instance */
   IChannelHandler channelHandler = null;
 
+  /** A small worker blocking on the SSL socket creating data for the input stream */
+  SSLWorker worker = null;
+
   static {
     addFactory( "tcp", "coyote.commons.network.socket.tcp.TCPSocketFactory" );
     addFactory( "ssl", "coyote.commons.network.socket.ssl.SSLSocketFactory" );
@@ -94,7 +100,14 @@ public final class SocketChannel implements Runnable, IChannel {
    */
   public SocketChannel( Socket socket, String protocol ) throws IOException {
     this.socket = socket;
-    input = new BufferedInputStream( socket.getInputStream() );
+
+    if ( socket instanceof SSLSocket ) {
+      worker = new SSLWorker( (SSLSocket)socket );
+      input = new BufferedInputStream( worker.getInputStream() );
+    } else {
+      input = new BufferedInputStream( socket.getInputStream() );
+    }
+
     output = new BufferedOutputStream( socket.getOutputStream() );
     localURI = asURI( protocol, socket.getLocalAddress(), socket.getLocalPort() );
     remoteURI = asURI( protocol, socket.getInetAddress(), socket.getPort() );
@@ -115,7 +128,6 @@ public final class SocketChannel implements Runnable, IChannel {
   public SocketChannel( Socket socket, String protocol, SocketServer srvr ) throws IOException {
     server = srvr;
     this.socket = socket;
-    input = new BufferedInputStream( socket.getInputStream() );
     output = new BufferedOutputStream( socket.getOutputStream() );
     localURI = asURI( protocol, socket.getLocalAddress(), socket.getLocalPort() );
     remoteURI = asURI( protocol, socket.getInetAddress(), socket.getPort() );
@@ -139,6 +151,11 @@ public final class SocketChannel implements Runnable, IChannel {
    */
   public boolean isOpen() {
     int available;
+    
+    // check to see if this is a SSL socket by the existance of a worker
+    if(worker!= null){
+      return worker.isOpen();
+    }else {
 
     try {
       available = input.available();
@@ -174,6 +191,7 @@ public final class SocketChannel implements Runnable, IChannel {
 
     // as long as we are not -1 we are open for business
     return ( available >= 0 );
+    }
   }
 
 
@@ -374,6 +392,15 @@ public final class SocketChannel implements Runnable, IChannel {
    * @throws IOException
    */
   public void close() throws IOException {
+
+    if ( worker != null ) {
+      try {
+        worker.close();
+      } catch ( Exception exception ) {}
+      finally {}
+
+    }
+
     // Close the input
     try {
       input.close();
