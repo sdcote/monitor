@@ -28,9 +28,6 @@ import coyote.loader.log.Log;
 
 /**
  * Class HttpResponse
- *
- * @author Stephan D. Cote' - Enterprise Architecture
- * @version $Revision: 1.5 $
  */
 public class HttpResponse extends HttpMessage {
   private Date date = new Date();
@@ -137,7 +134,19 @@ public class HttpResponse extends HttpMessage {
       // Keep looping
       while ( true ) {
         try {
-          // Make sure we have data in the stream
+          // Make sure we have data in the stream 
+          // WONT WORK WITH SSL!!! Our streams cannot tell the length of the 
+          // data without first decrypting it. {@code available()} will always 
+          // return 0 for SSLSocket.
+
+          // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+          // A possible solution is to abstract everything behind the 
+          // SocketChannel and let it handle the differences between TCP and 
+          // SSL...Maybe a SSL channel has a separate thread which reads data 
+          // from the socket and places it in a FIFO structure for the client 
+          // to read...
+          // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+
           if ( in.available() > 0 ) {
             if ( responseReceived == 0 ) {
               responseReceived = System.currentTimeMillis();

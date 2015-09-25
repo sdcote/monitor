@@ -19,12 +19,14 @@ import java.net.Socket;
 import java.security.KeyStore;
 import java.security.SecureRandom;
 import java.security.Security;
+import java.security.cert.Certificate;
 import java.util.Random;
 
 import javax.net.ssl.HandshakeCompletedEvent;
 import javax.net.ssl.HandshakeCompletedListener;
 import javax.net.ssl.KeyManagerFactory;
 import javax.net.ssl.SSLContext;
+import javax.net.ssl.SSLPeerUnverifiedException;
 import javax.net.ssl.SSLSocket;
 import javax.net.ssl.TrustManager;
 
@@ -255,7 +257,27 @@ public class SSLSocketFactory implements ISocketFactory {
    */
   class MyHandshakeListener implements HandshakeCompletedListener {
     public void handshakeCompleted( HandshakeCompletedEvent e ) {
-      Log.trace( "SSL handshake complete - session: " + e.getSession() );
+      if ( Log.isLogging( Log.TRACE_EVENTS ) ) {
+        Log.trace( "SSL handshake complete - session: " + e.getSession() );
+        Log.trace( "Using cipher suite: " + e.getCipherSuite() );
+        if ( e.getLocalPrincipal() != null ) {
+          Log.trace( "Local Principal: " + e.getLocalPrincipal() );
+        }
+        try {
+          if ( e.getPeerPrincipal() != null )
+            Log.trace( "Peer Principal: " + e.getPeerPrincipal() );
+        } catch ( SSLPeerUnverifiedException ignore ) {}
+        Certificate[] certs = e.getLocalCertificates();
+        if ( certs != null ) {
+          Log.trace( "Handshake returned " + certs.length + " local certs" );
+          for ( int i = 0; i < certs.length; i++ ) {
+            Certificate cert = certs[i];
+            Log.trace( "cert: " + cert.toString() );
+          }
+        } else {
+          Log.trace( "Handshake returned no local certs" );
+        }
+      }
     }
   }
 

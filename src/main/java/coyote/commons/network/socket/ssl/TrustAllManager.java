@@ -20,7 +20,8 @@ import coyote.loader.log.Log;
 
 
 /**
- * 
+ * Handy little class to use when its acceptable to allow a connection from any 
+ * client or any server; usually during development and testing.
  */
 public class TrustAllManager implements X509TrustManager {
   private static final X509Certificate[] NO_CERTS = new X509Certificate[0];
@@ -36,7 +37,8 @@ public class TrustAllManager implements X509TrustManager {
     if ( Log.isLogging( Log.TRACE_EVENTS ) ) {
       Log.trace( "Checking client - authentication type: " + authType );
       for ( int x = 0; x < chain.length; x++ ) {
-        Log.trace( chain[x].getSubjectX500Principal() );
+        Log.trace( "Principal: " + chain[x].getSubjectX500Principal() );
+        Log.trace( "   Issuer: " + chain[x].getIssuerDN() );
       }
     }
   }
@@ -52,7 +54,8 @@ public class TrustAllManager implements X509TrustManager {
     if ( Log.isLogging( Log.TRACE_EVENTS ) ) {
       Log.trace( "Checking server - authentication type: " + authType );
       for ( int x = 0; x < chain.length; x++ ) {
-        Log.trace( chain[x].getSubjectX500Principal() );
+        Log.trace( "Principal: " + chain[x].getSubjectX500Principal() );
+        Log.trace( "   Issuer: " + chain[x].getIssuerDN() );
       }
     }
   }

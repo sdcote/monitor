@@ -297,9 +297,7 @@ public final class SocketChannel implements Runnable, IChannel {
   public static URI asURI( String scheme, InetAddress inetaddress, int port ) {
     try {
       return new URI( scheme + "://" + inetaddress.getHostAddress() + ":" + port );
-    } catch ( URISyntaxException e ) {
-      // e.printStackTrace();
-    }
+    } catch ( URISyntaxException ignore ) {}
 
     return null;
   }

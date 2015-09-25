@@ -95,6 +95,7 @@ public class InstallServerCert {
   private static int DEFAULT_PORT = 443;
   private static String DEFAULT_PHRASE = "changeit";
   private static final X509Certificate[] NO_CERTS = new X509Certificate[0];
+  private static final char FILE_DELIM = File.separatorChar;
 
 
 
@@ -110,16 +111,17 @@ public class InstallServerCert {
     int port;
     char[] passphrase;
     if ( ( args.length == 1 ) || ( args.length == 2 ) ) {
-      String[] c = args[0].split( ":" );
-      host = c[0];
+      String[] server = args[0].split( ":" );
+      host = server[0];
 
-      port = ( c.length == 1 ) ? DEFAULT_PORT : Integer.parseInt( c[1] );
+      port = ( server.length == 1 ) ? DEFAULT_PORT : Integer.parseInt( server[1] );
 
-      String p = ( args.length == 1 ) ? DEFAULT_PHRASE : args[1];
-      passphrase = p.toCharArray();
+      String phrase = ( args.length == 1 ) ? DEFAULT_PHRASE : args[1];
+      passphrase = phrase.toCharArray();
 
     } else {
-      System.out.println( "Usage: java InstallServerCert [:port] [passphrase]" );
+      System.out.println( "Usage: java InstallServerCert host[:port] [passphrase]" );
+      System.out.println( "    host - the name of the host to query" );
       System.out.println( "    port defaults to '" + DEFAULT_PORT + "'" );
       System.out.println( "    passphrase defaults to '" + DEFAULT_PHRASE + "'" );
       return;
@@ -127,8 +129,7 @@ public class InstallServerCert {
 
     File file = new File( "jssecacerts" );
     if ( file.isFile() == false ) {
-      char SEP = File.separatorChar;
-      File dir = new File( System.getProperty( "java.home" ) + SEP + "lib" + SEP + "security" );
+      File dir = new File( System.getProperty( "java.home" ) + FILE_DELIM + "lib" + FILE_DELIM + "security" );
       file = new File( dir, "jssecacerts" );
       if ( file.isFile() == false ) {
         file = new File( dir, "cacerts" );
@@ -191,16 +192,16 @@ public class InstallServerCert {
 
     System.out.println( "Enter certificate to add to trusted keystore or 'q' to quit: [1]" );
     String line = reader.readLine().trim();
-    int k;
+    int index;
     try {
-      k = ( line.length() == 0 ) ? 0 : Integer.parseInt( line ) - 1;
+      index = ( line.length() == 0 ) ? 0 : Integer.parseInt( line ) - 1;
     } catch ( NumberFormatException e ) {
       System.out.println( "KeyStore not changed" );
       return;
     }
 
-    X509Certificate cert = chain[k];
-    String alias = host + "-" + ( k + 1 );
+    X509Certificate cert = chain[index];
+    String alias = host + "-" + ( index + 1 );
     keystore.setCertificateEntry( alias, cert );
 
     OutputStream out = new FileOutputStream( "jssecacerts" );
