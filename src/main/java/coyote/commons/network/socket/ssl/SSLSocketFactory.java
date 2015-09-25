@@ -11,7 +11,6 @@
  */
 package coyote.commons.network.socket.ssl;
 
-import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.net.InetAddress;
@@ -59,12 +58,6 @@ public class SSLSocketFactory implements ISocketFactory {
 
   static final Random regularRandom = new Random();
 
-  String home;
-
-  String trustStore;
-
-  String trustStorePassword;
-
   javax.net.ssl.SSLSocketFactory socketFactory;
 
   javax.net.ssl.SSLServerSocketFactory serverSocketFactory;
@@ -85,56 +78,62 @@ public class SSLSocketFactory implements ISocketFactory {
 
 
   /**
-   * Initialize the SSL keystore and socket factories
+   * Initialize the SSL keystore and socket factories.
+   * 
+   * <p>If there is a truststore specified in the {@code javax.net.ssl.trustStore} 
+   * system property use that truststore and a X509 Trust Manager. If not, use 
+   * a default "Trust-All" trust manager and accept any certificate sent by the
+   * server. FYI: the truststore is usually found in 
+   * {@code JAVA_HOME/lib/security/cacerts}.</p>
+   * 
+   * <p>In order to use the truststore, a truststore passphrase needs to be 
+   * specified in the {@code javax.net.ssl.trustStorePassword} system property.
+   * FYI: the default passphrase is usually {@code changeit}.</p>
    * 
    * @see coyote.commons.network.socket.ISocketFactory#initialize()
    */
   @Override
   public void initialize() throws Exception {
-    try {
 
-      //Security.addProvider( new com.sun.net.ssl.internal.ssl.Provider() );
+    // What JRE are we using?
+    String home = System.getProperty( "java.home" );
+
+    // Determine a trust manager using the requested keystore
+    String trustStore = System.getProperty( "javax.net.ssl.trustStore" );
+
+    // What is the password used to create the trust store
+    String trustStorePassword = System.getProperty( "javax.net.ssl.trustStorePassword" );
+
+    try {
 
       Security.addProvider( new Provider() );
       SecureRandom securerandom = new SecureRandom();
       securerandom.setSeed( regularRandom.nextLong() );
       SSLContext sslcontext = SSLContext.getInstance( "SSL" );
 
-      // / / / / / / / / / / / / / / / / / / / / / / / / / / / / / / / / / / / / /
-      // develop a strategy for specifying a keystore for an X509 key manager
-      // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+      // if there is a trust store defined, use it
+      if ( trustStore != null ) {
+        Log.trace( "Using a truststore of " + trustStore );
 
-      // Setup a trust manager using the requested keystore
-      trustStore = System.getProperty( "javax.net.ssl.trustStore" );
+        // if none specified, use a default
+        if ( trustStorePassword == null ) {
+          trustStorePassword = DEFAULT_PASSWORD;
+        }
+        Log.trace( "Using a passphrase of " + trustStorePassword );
 
-      // if there is no trust store defined, use the cacerts file in the JRE home
-      if ( trustStore == null ) {
-        home = System.getProperty( "java.home" );
-        trustStore = String.valueOf( ( new StringBuffer( String.valueOf( home ) ) ).append( File.separator ).append( "lib" ).append( File.separator ).append( "security" ).append( File.separator ).append( "cacerts" ) );
+        // Setup an X509 key manager
+        char tspChars[] = trustStorePassword.toCharArray();
+        KeyManagerFactory keymanagerfactory = KeyManagerFactory.getInstance( "SunX509" );
+        KeyStore keystore = KeyStore.getInstance( "JKS" );
+        keystore.load( new FileInputStream( trustStore ), tspChars );
+        keymanagerfactory.init( keystore, tspChars );
+        sslcontext.init( keymanagerfactory.getKeyManagers(), null, securerandom );
+      } else {
+        Log.trace( "No truststore specified in system properties, using a trust-all manager" );
+
+        // Just use a trust-all manager until we design an easy to use strategy
+        sslcontext.init( null, new TrustManager[] { new TrustAllManager() }, null );
       }
-      Log.trace( "Using a truststore of " + trustStore );
-
-      // What is the password used to create the trust store
-      trustStorePassword = System.getProperty( "javax.net.ssl.trustStorePassword" );
-
-      // if none specified, use a default
-      if ( trustStorePassword == null ) {
-        trustStorePassword = DEFAULT_PASSWORD;
-      }
-      Log.trace( "Using a passphrase of " + trustStorePassword );
-
-      // Setup an X509 key manager
-      char tspChars[] = trustStorePassword.toCharArray();
-      KeyManagerFactory keymanagerfactory = KeyManagerFactory.getInstance( "SunX509" );
-      KeyStore keystore = KeyStore.getInstance( "JKS" );
-      keystore.load( new FileInputStream( trustStore ), tspChars );
-      keymanagerfactory.init( keystore, tspChars );
-      //  sslcontext.init( keymanagerfactory.getKeyManagers(), null, securerandom );
-      // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-      // Just use a trust-all manager until we design an easy to use strategy
-      sslcontext.init( null, new TrustManager[] { new TrustAllManager() }, null );
-
-      // / / / / / / / / / / / / / / / / / / / / / / / / / / / / / / / / / / / / /
 
       // Get the socket factories for client and server sockets 
       socketFactory = sslcontext.getSocketFactory();
@@ -256,8 +255,7 @@ public class SSLSocketFactory implements ISocketFactory {
    */
   class MyHandshakeListener implements HandshakeCompletedListener {
     public void handshakeCompleted( HandshakeCompletedEvent e ) {
-      System.out.println( "SSL Handshake succesful!" );
-      System.out.println( "SSL Session: " + e.getSession() );
+      Log.trace( "SSL handshake complete - session: " + e.getSession() );
     }
   }
 
