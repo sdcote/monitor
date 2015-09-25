@@ -78,16 +78,7 @@ public class SSLSocketFactory implements ISocketFactory {
    * @throws Exception
    */
   public SSLSocketFactory() throws Exception {
-    try {
-      initialize();
-    } catch ( Exception exception ) {
-      System.out.println( "SSL startup exception" );
-      System.out.println( "  java.home = ".concat( String.valueOf( home ) ) );
-      System.out.println( "  javax.net.ssl.trustStore = ".concat( String.valueOf( trustStore ) ) );
-      System.out.println( "  javax.net.ssl.trustStorePassword = ".concat( String.valueOf( trustStorePassword ) ) );
 
-      throw exception;
-    }
   }
 
 
@@ -100,53 +91,63 @@ public class SSLSocketFactory implements ISocketFactory {
    */
   @Override
   public void initialize() throws Exception {
+    try {
 
-    //Security.addProvider( new com.sun.net.ssl.internal.ssl.Provider() );
+      //Security.addProvider( new com.sun.net.ssl.internal.ssl.Provider() );
 
-    Security.addProvider( new Provider() );
-    SecureRandom securerandom = new SecureRandom();
-    securerandom.setSeed( regularRandom.nextLong() );
-    SSLContext sslcontext = SSLContext.getInstance( "SSL" );
+      Security.addProvider( new Provider() );
+      SecureRandom securerandom = new SecureRandom();
+      securerandom.setSeed( regularRandom.nextLong() );
+      SSLContext sslcontext = SSLContext.getInstance( "SSL" );
 
-    // / / / / / / / / / / / / / / / / / / / / / / / / / / / / / / / / / / / / /
-    // develop a strategy for specifying a keystore for an X509 key manager
-    // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+      // / / / / / / / / / / / / / / / / / / / / / / / / / / / / / / / / / / / / /
+      // develop a strategy for specifying a keystore for an X509 key manager
+      // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
-    // Setup a trust manager using the requested keystore
-    trustStore = System.getProperty( "javax.net.ssl.trustStore" );
+      // Setup a trust manager using the requested keystore
+      trustStore = System.getProperty( "javax.net.ssl.trustStore" );
 
-    // if there is no trust store defined, use the cacerts file in the JRE home
-    if ( trustStore == null ) {
-      home = System.getProperty( "java.home" );
-      trustStore = String.valueOf( ( new StringBuffer( String.valueOf( home ) ) ).append( File.separator ).append( "lib" ).append( File.separator ).append( "security" ).append( File.separator ).append( "cacerts" ) );
+      // if there is no trust store defined, use the cacerts file in the JRE home
+      if ( trustStore == null ) {
+        home = System.getProperty( "java.home" );
+        trustStore = String.valueOf( ( new StringBuffer( String.valueOf( home ) ) ).append( File.separator ).append( "lib" ).append( File.separator ).append( "security" ).append( File.separator ).append( "cacerts" ) );
+      }
+      Log.trace( "Using a truststore of " + trustStore );
+
+      // What is the password used to create the trust store
+      trustStorePassword = System.getProperty( "javax.net.ssl.trustStorePassword" );
+
+      // if none specified, use a default
+      if ( trustStorePassword == null ) {
+        trustStorePassword = DEFAULT_PASSWORD;
+      }
+      Log.trace( "Using a passphrase of " + trustStorePassword );
+
+      // Setup an X509 key manager
+      char tspChars[] = trustStorePassword.toCharArray();
+      KeyManagerFactory keymanagerfactory = KeyManagerFactory.getInstance( "SunX509" );
+      KeyStore keystore = KeyStore.getInstance( "JKS" );
+      keystore.load( new FileInputStream( trustStore ), tspChars );
+      keymanagerfactory.init( keystore, tspChars );
+      //  sslcontext.init( keymanagerfactory.getKeyManagers(), null, securerandom );
+      // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+      // Just use a trust-all manager until we design an easy to use strategy
+      sslcontext.init( null, new TrustManager[] { new TrustAllManager() }, null );
+
+      // / / / / / / / / / / / / / / / / / / / / / / / / / / / / / / / / / / / / /
+
+      // Get the socket factories for client and server sockets 
+      socketFactory = sslcontext.getSocketFactory();
+      serverSocketFactory = sslcontext.getServerSocketFactory();
+
+    } catch ( Exception exception ) {
+      System.out.println( "SSL startup exception" );
+      System.out.println( "  java.home = ".concat( String.valueOf( home ) ) );
+      System.out.println( "  javax.net.ssl.trustStore = ".concat( String.valueOf( trustStore ) ) );
+      System.out.println( "  javax.net.ssl.trustStorePassword = ".concat( String.valueOf( trustStorePassword ) ) );
+
+      throw exception;
     }
-    Log.trace("Using a truststore of "+trustStore);
-
-    // What is the password used to create the trust store
-    trustStorePassword = System.getProperty( "javax.net.ssl.trustStorePassword" );
-
-    // if none specified, use a default
-    if ( trustStorePassword == null ) {
-      trustStorePassword = DEFAULT_PASSWORD;
-    }
-    Log.trace("Using a passphrase of "+trustStorePassword);
-
-    // Setup an X509 key manager
-    char tspChars[] = trustStorePassword.toCharArray();
-    KeyManagerFactory keymanagerfactory = KeyManagerFactory.getInstance( "SunX509" );
-    KeyStore keystore = KeyStore.getInstance( "JKS" );
-    keystore.load( new FileInputStream( trustStore ), tspChars );
-    keymanagerfactory.init( keystore, tspChars );
-    //  sslcontext.init( keymanagerfactory.getKeyManagers(), null, securerandom );
-    // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-    // Just use a trust-all manager until we design an easy to use strategy
-    sslcontext.init( null, new TrustManager[] { new TrustAllManager() }, null );
-
-    // / / / / / / / / / / / / / / / / / / / / / / / / / / / / / / / / / / / / /
-
-    // Get the socket factories for client and server sockets 
-    socketFactory = sslcontext.getSocketFactory();
-    serverSocketFactory = sslcontext.getServerSocketFactory();
   }
 
 
