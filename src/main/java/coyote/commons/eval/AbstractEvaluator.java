@@ -11,7 +11,8 @@ import java.util.List;
 import java.util.Map;
 
 
-/** An abstract evaluator, able to evaluate infix expressions.
+/** 
+ * An abstract evaluator, able to evaluate infix expressions.
  * 
  * <p>Some standard evaluators are included in the library, you can define your 
  * own by subclassing this class.</p>
