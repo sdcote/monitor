@@ -469,9 +469,15 @@ public class HttpRequest extends HttpMessage {
 
     // Open a connection to the given URI
     try {
-      // Create a socket channel to the specified host
-      channel = SocketChannel.createSocketChannel( uri );
 
+      // if there is a proxy specified, open the channel to the proxy
+      if ( isUsingProxy() ) {
+        // Create a socket channel to the configured proxy
+        channel = createProxyChannel();
+      } else {
+        // Create a socket channel to the specified host
+        channel = SocketChannel.createSocketChannel( uri );
+      }
       if ( ( channel != null ) && channel.isOpen() ) {
         // Set our connection information
         remoteAddress = UriUtil.getHostAddress( channel.getRemoteURI() );
@@ -485,7 +491,7 @@ public class HttpRequest extends HttpMessage {
 
         // set the timeout to match ours
         response.setTimeout( this.getTimeout() );
-        
+
         // Send the request over the socket we just opened
         channel.getOutputStream().write( toString().getBytes( HTTP_ENCODING ) );
         channel.getOutputStream().flush();
@@ -512,6 +518,49 @@ public class HttpRequest extends HttpMessage {
         }
       }
     }
+  }
+
+
+
+
+  private boolean isUsingProxy() {
+    // if there is a proxy specified  
+    // http.proxyHost=http-proxy.nwie.net
+    // http.proxyPort=8080
+    //
+    // http.proxyUser=cotes7
+    // http.proxyPassword=
+    // http.proxyDomain=NWIE
+
+    return false;
+  }
+
+
+
+
+  /**
+   * @return a connection through the currently configured proxy
+   * 
+   * @throws IOException 
+   */
+  private SocketChannel createProxyChannel() throws IOException {
+    URI uri;
+    SocketChannel retval = null;
+    try {
+      
+      // TODO: Make this work
+      uri = new URI( requestScheme + "://" + getRequestHost() + getRequestPath() );
+
+      retval = SocketChannel.createSocketChannel( uri );
+      
+      
+      // TODO: handle any authentication
+      
+      
+
+    } catch ( URISyntaxException ignore ) {}
+
+    return retval;
   }
 
 
